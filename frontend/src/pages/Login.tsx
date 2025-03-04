@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, LogIn, User, Lock, ArrowRight, Github, Twitter, Facebook, Home } from 'lucide-react';
+import { Eye, EyeOff, LogIn, User, Lock, ArrowRight, Github, Twitter, Facebook, Home, Award } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export function Login() {
@@ -215,7 +215,7 @@ export function Login() {
                 </div>
                 <div className="flex items-center bg-white bg-opacity-10 p-3 rounded-lg">
                   <div className="flex-shrink-0 bg-white bg-opacity-20 p-2 rounded-full">
-                    <Users className="h-5 w-5 text-white" />
+                    <User className="h-5 w-5 text-white" />
                   </div>
                   <div className="ml-3 text-left">
                     <p className="text-sm font-medium">Join clubs you love</p>
