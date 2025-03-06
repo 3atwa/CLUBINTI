@@ -1,4 +1,3 @@
-import React from 'react';
 import { Home, Compass, User, Award, Settings, LogIn } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';

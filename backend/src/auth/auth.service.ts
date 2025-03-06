@@ -47,7 +47,7 @@ export class AuthService {
 
   async login(
     loginData: AuthDto,
-  ): Promise<{ message: string; access_token: string }> {
+  ): Promise<{ message: string; access_token: string;user: User }> {
     const user = await this.userModel
       .findOne({ email: loginData.email })
       .exec();
@@ -65,7 +65,7 @@ export class AuthService {
         user.role,
       );
 
-      return { message, access_token };
+      return { message, access_token, user };
     } else {
       throw new HttpException('Incorrect password', HttpStatus.UNAUTHORIZED);
     }
@@ -113,8 +113,8 @@ export class AuthService {
       email,
       role,
     };
-    const secret = this.config.get('JWT_SECRET');
-    const expirationTime = this.config.get('JWT_EXPIRATION_TIME');
+    const secret = 'CLUBENTY1StheBE5TPF4ever';
+    const expirationTime = '4h';
 
     const token = await this.jwt.signAsync(payload, {
       expiresIn: expirationTime, // 1440m = 1 day
@@ -128,7 +128,7 @@ export class AuthService {
     try {
       // Use JwtService to verify the token with the secret
       const payload = this.jwt.verify(token, {
-        secret: this.config.get('JWT_SECRET'),
+        secret: 'CLUBENTY1StheBE5TPF4ever',
       });
 
       // Now you have the decoded payload

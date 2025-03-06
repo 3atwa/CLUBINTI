@@ -16,32 +16,32 @@ export function Register() {
   const navigate = useNavigate();
   const { register } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    
-    // Validate form
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    
-    if (!agreeToTerms) {
-      setError('You must agree to the terms and conditions');
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    try {
-      await register(name, email, password);
-      navigate('/profile');
-    } catch (err) {
-      setError('Failed to create an account. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError('');
+
+  // Validate form
+  if (password !== confirmPassword) {
+    setError('Passwords do not match');
+    return;
+  }
+
+  if (!agreeToTerms) {
+    setError('You must agree to the terms and conditions');
+    return;
+  }
+
+  setIsLoading(true);
+
+  try {
+    await register(name, email, password); // Call the register function from useAuth
+    navigate('/login'); // Redirect to profile page after successful registration
+  } catch (err) {
+    setError('Failed to create an account. Please try again.');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-gray-900 dark:to-indigo-950 flex items-center justify-center p-4">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { Activity } from '../types';
 import { Heart, MessageCircle, Share2, Users, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';

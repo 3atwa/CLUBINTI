@@ -9,7 +9,7 @@ const mockProfile: UserProfile = {
   id: '1',
   name: 'John Doe',
   email: 'john@example.com',
-  avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80',
+  avatar: '',
   bio: 'Software developer and photography enthusiast. Love to participate in tech and creative clubs.',
   location: 'San Francisco, CA',
   occupation: 'Software Engineer',
@@ -130,7 +130,7 @@ export function Profile() {
             </div>
             
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-              <div className="h-48 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800 relative">
+              <div className="h-48 bg-blue">
                 <div className="absolute inset-0 bg-pattern opacity-10"></div>
               </div>
               
