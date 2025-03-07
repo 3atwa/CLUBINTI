@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { UserProfile, Club } from '../types';
+import  { useState } from 'react';
+import { UserProfile } from '../types';
 import { BackButton } from '../components/BackButton';
 import { Link } from 'react-router-dom';
 import { Users, Bell, Mail, Calendar, MapPin, Briefcase, Award, Settings, ChevronRight, Shield, User as UserIcon, Compass, LogIn, UserPlus } from 'lucide-react';
@@ -131,7 +131,7 @@ export function Profile() {
             
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
               <div className="h-48 bg-blue">
-                <div className="absolute inset-0 bg-pattern opacity-10"></div>
+                
               </div>
               
               <div className="px-6 py-8 sm:px-8 sm:py-10 text-center">

@@ -76,15 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   
       const data = await response.json();
       console.log('Registration response:', data); // Log the response for debugging
-  
-      const { user } = data; // Extract the user data from the response
-  
-      // Save the user data in localStorage (if needed)
-      localStorage.setItem('user', JSON.stringify(user));
-  
-      // Update the auth state
-      setIsAuthenticated(true);
-      setUser(user);
+
     } catch (error) {
       console.error('Registration error:', error);
       throw error; // Re-throw the error to handle it in the component

@@ -16,9 +16,6 @@ export class UpdateUserDto {
   @IsEmail()
   readonly email?: string;
 
-  @IsOptional()
-  @IsString()
-  readonly phone?: string;
 
   @IsOptional()
   @IsString()

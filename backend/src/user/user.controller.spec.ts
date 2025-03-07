@@ -35,7 +35,6 @@ describe('UserController', () => {
         _id: '663420d9f7d6891f6d8e309b', // Sample id
         name: 'Dupont Jean',
         email: 'jean.dupont@example.com',
-        phone: '1234567890',
         role: 'admin',
         password: 'hashedPassword',
         resetPasswordToken: 'resetToken',
