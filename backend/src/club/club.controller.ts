@@ -13,6 +13,13 @@ import {
   import { UpdateClubDto } from './dto/update-club.dto';
   import { AddMemberDto } from './dto/add-member.dto';
   import { ApproveMemberDto } from './dto/approve-member.dto';
+  import { CreateCommentDto } from './dto/create-comment.dto';
+
+
+
+
+
+
   
   @Controller('clubs')
   export class ClubController {
@@ -64,4 +71,20 @@ import {
     async getClub(@Param('clubId') clubId: string) {
       return this.clubService.getClub(clubId);
     }
+
+    @Post('posts/:postId/comments')
+    async createComment(
+      @Param('postId') postId: string,
+      @Body() createCommentDto: CreateCommentDto,
+    ) {
+      return this.clubService.createComment(postId, createCommentDto);
+    }
+  
+    @Get('posts/:postId/comments')
+    async getPostComments(@Param('postId') postId: string) {
+      return this.clubService.getPostComments(postId);
+    }
+
+
+
   }

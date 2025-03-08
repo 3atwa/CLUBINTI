@@ -1,6 +1,6 @@
 // src/schemas/club.schema.ts
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document,Types  } from 'mongoose';
 
 @Schema() // _id: false to avoid generating an _id for subdocuments
 export class Club extends Document {
@@ -34,6 +34,7 @@ export class Club extends Document {
   @Prop()
   ownerId?: string; // Only present if the user owns the club
 
+
   @Prop({ type: [{ id: String, name: String, email: String, avatar: String }] })
   pendingMembers?: Array<{
     id: string;
@@ -41,6 +42,12 @@ export class Club extends Document {
     email: string;
     avatar: string;
   }>;
+
+
+  
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Post' }], default: [] })
+  posts: Types.ObjectId[];
+
 }
 
 export const ClubSchema = SchemaFactory.createForClass(Club);
