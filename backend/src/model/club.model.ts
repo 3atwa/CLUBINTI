@@ -2,7 +2,7 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-@Schema({ _id: false }) // _id: false to avoid generating an _id for subdocuments
+@Schema() // _id: false to avoid generating an _id for subdocuments
 export class Club extends Document {
   @Prop({ required: true })
   id: string;
