@@ -14,6 +14,7 @@ import {
   import { AddMemberDto } from './dto/add-member.dto';
   import { ApproveMemberDto } from './dto/approve-member.dto';
   import { CreateCommentDto } from './dto/create-comment.dto';
+import { CreatePostDto } from './dto/create-post.dto';
 
 
 
@@ -71,6 +72,11 @@ import {
     async getClub(@Param('clubId') clubId: string) {
       return this.clubService.getClub(clubId);
     }
+    
+    @Get()
+    async getClubs() {
+      return this.clubService.getClubs();
+    }
 
     @Post('posts/:postId/comments')
     async createComment(
@@ -85,6 +91,18 @@ import {
       return this.clubService.getPostComments(postId);
     }
 
+    @Get(':clubId/posts')
+    async getClubPosts(@Param('clubId') clubId: string) {
+      return this.clubService.getClubPosts(clubId);
+    }
 
+  @Post(':clubId/posts')
+  async createPost(
+    @Param('clubId') clubId: string,
+    @Body() createPostDto: CreatePostDto,
+  ) {
+    return this.clubService.createPost(clubId, createPostDto);
+  }
 
+    
   }

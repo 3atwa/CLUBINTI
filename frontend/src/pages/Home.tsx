@@ -1,8 +1,9 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import { Activity } from '../types';
 import { Heart, MessageCircle, Share2, Users, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CommentSection } from '../components/CommentSection';
+import Ranking from '../components/Ranking';
 
 const recentActivities: Activity[] = [
   {
@@ -41,6 +42,8 @@ const recentActivities: Activity[] = [
     ]
   }
 ];
+
+
 
 export function Home() {
   const [activities, setActivities] = useState(recentActivities);
@@ -88,6 +91,8 @@ export function Home() {
     }));
   };
 
+ 
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -111,107 +116,112 @@ export function Home() {
             </div>
           </div>
 
-          {/* Recent Activities Feed */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">Latest Updates</h2>
-            <div className="space-y-6">
-              {activities.map((activity) => (
-                <div
-                  key={activity.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden"
-                >
-                  {/* Post Header */}
-                  <div className="p-4 flex items-center">
-                    <Link to={`/club/${activity.clubId}`} className="flex items-center flex-1">
+          <div className="flex gap-8">
+            {/* Recent Activities Feed */}
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">Latest Updates</h2>
+              <div className="space-y-6">
+                {activities.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden"
+                  >
+                    {/* Post Header */}
+                    <div className="p-4 flex items-center">
+                      <Link to={`/club/${activity.clubId}`} className="flex items-center flex-1">
+                        <img
+                          src={activity.clubAvatar}
+                          alt={activity.clubName}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                        <div className="ml-3">
+                          <h3 className="font-semibold text-gray-900 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400">
+                            {activity.clubName}
+                          </h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {new Date(activity.date).toLocaleDateString('en-US', {
+                              month: 'long',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                        </div>
+                      </Link>
+                      <Link
+                        to={`/club/${activity.clubId}`}
+                        className="flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        <Users size={16} className="mr-1" />
+                        <span>View Club</span>
+                      </Link>
+                    </div>
+
+                    {/* Post Content */}
+                    <div className="px-4 pb-3">
+                      <p className="text-gray-800 dark:text-gray-200 whitespace-pre-line">{activity.description}</p>
+                    </div>
+
+                    {activity.image && (
                       <img
-                        src={activity.clubAvatar}
-                        alt={activity.clubName}
-                        className="w-12 h-12 rounded-full object-cover"
+                        src={activity.image}
+                        alt={activity.title}
+                        className="w-full aspect-video object-cover"
                       />
-                      <div className="ml-3">
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400">
-                          {activity.clubName}
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {new Date(activity.date).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </p>
-                      </div>
-                    </Link>
-                    <Link
-                      to={`/club/${activity.clubId}`}
-                      className="flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
-                    >
-                      <Users size={16} className="mr-1" />
-                      <span>View Club</span>
-                    </Link>
-                  </div>
+                    )}
 
-                  {/* Post Content */}
-                  <div className="px-4 pb-3">
-                    <p className="text-gray-800 dark:text-gray-200 whitespace-pre-line">{activity.description}</p>
-                  </div>
-
-                  {activity.image && (
-                    <img
-                      src={activity.image}
-                      alt={activity.title}
-                      className="w-full aspect-video object-cover"
-                    />
-                  )}
-
-                  {/* Post Actions */}
-                  <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <button
-                          onClick={() => handleLike(activity.id)}
-                          className={`flex items-center space-x-1 ${
-                            activity.isLiked ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'
-                          } hover:text-red-500 transition-colors`}
-                        >
-                          <Heart
-                            size={20}
-                            className={activity.isLiked ? 'fill-current' : ''}
-                          />
-                          <span>{activity.likes}</span>
-                        </button>
-                        <button 
-                          onClick={() => toggleComments(activity.id)}
-                          className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
-                        >
-                          <MessageCircle size={20} />
-                          <span>
-                            {activity.comments && activity.comments.length > 0 
-                              ? `Comments (${activity.comments.length})` 
-                              : 'Comment'}
-                          </span>
-                        </button>
-                        <button className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
-                          <Share2 size={20} />
-                          <span>Share</span>
-                        </button>
+                    {/* Post Actions */}
+                    <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <button
+                            onClick={() => handleLike(activity.id)}
+                            className={`flex items-center space-x-1 ${
+                              activity.isLiked ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'
+                            } hover:text-red-500 transition-colors`}
+                          >
+                            <Heart
+                              size={20}
+                              className={activity.isLiked ? 'fill-current' : ''}
+                            />
+                            <span>{activity.likes}</span>
+                          </button>
+                          <button 
+                            onClick={() => toggleComments(activity.id)}
+                            className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
+                          >
+                            <MessageCircle size={20} />
+                            <span>
+                              {activity.comments && activity.comments.length > 0 
+                                ? `Comments (${activity.comments.length})` 
+                                : 'Comment'}
+                            </span>
+                          </button>
+                          <button className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
+                            <Share2 size={20} />
+                            <span>Share</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
+                    
+                    {/* Comment Section */}
+                    {expandedComments.includes(activity.id) && (
+                      <div className="px-4 pb-4">
+                        <CommentSection 
+                          postId={activity.id}
+                          comments={activity.comments || []}
+                          onAddComment={handleAddComment}
+                        />
+                      </div>
+                    )}
                   </div>
-                  
-                  {/* Comment Section */}
-                  {expandedComments.includes(activity.id) && (
-                    <div className="px-4 pb-4">
-                      <CommentSection 
-                        postId={activity.id}
-                        comments={activity.comments || []}
-                        onAddComment={handleAddComment}
-                      />
-                    </div>
-                  )}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+
+            {/* Rankings Sidebar */}
+                <Ranking />
           </div>
         </div>
       </main>

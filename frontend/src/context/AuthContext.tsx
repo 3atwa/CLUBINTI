@@ -22,6 +22,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkAuth = () => {
       const token = localStorage.getItem('access_token');
+      
   
       if (token ) {
         setIsAuthenticated(true);
@@ -42,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!response.ok) {
         throw new Error('Invalid email or password');
       }
-  
+      
       const data = await response.json();
       const { message,access_token, user } = data; // Assuming the backend returns a token and user data
   

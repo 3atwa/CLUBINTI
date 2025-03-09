@@ -117,6 +117,15 @@ export class ClubService {
     return club;
   }
 
+
+  async getClubs(): Promise<Club[]> {
+    const club = await this.clubModel.find().exec();
+    if (!club) {
+      throw new Error('Club not found');
+    }
+    return club;
+  }
+
   // Helper function to generate a unique club ID
   private generateClubId(): string {
     return Math.random().toString(36).substring(2, 15);
@@ -178,7 +187,6 @@ async getClubPosts(clubId: string): Promise<Post[]> {
     // Cast the populated posts to Post[]
     return club.posts as unknown as Post[];
   }
-  // src/club/club.service.ts
 // src/club/club.service.ts
 async getPostComments(postId: string): Promise<Comment[]> {
     const post = await this.postModel

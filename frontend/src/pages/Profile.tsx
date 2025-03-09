@@ -119,70 +119,7 @@ export function Profile() {
   // Calculate total points
   const totalPoints = Object.values(profile.points).reduce((sum, points) => sum + points, 0);
 
-  // If not authenticated, show login/register prompt
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-8">
-            <div className="mb-6">
-              <BackButton />
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-              <div className="h-48 bg-blue">
-                
-              </div>
-              
-              <div className="px-6 py-8 sm:px-8 sm:py-10 text-center">
-                <div className="flex flex-col items-center -mt-24 mb-6">
-                  <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center border-4 border-white dark:border-gray-800">
-                    <UserIcon className="w-16 h-16 text-gray-400 dark:text-gray-500" />
-                  </div>
-                </div>
-                
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">Join Our Community</h2>
-                <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-8">
-                  Sign in to your account to view your profile, join clubs, and connect with other members.
-                </p>
-                
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <Link
-                    to="/login"
-                    className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                  >
-                    <LogIn className="w-5 h-5 mr-2" />
-                    Sign In
-                  </Link>
-                  
-                  <Link
-                    to="/register"
-                    className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    <UserPlus className="w-5 h-5 mr-2" />
-                    Create Account
-                  </Link>
-                </div>
-                
-                <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">
-                    Want to explore clubs before signing up?
-                  </p>
-                  <Link
-                    to="/explore"
-                    className="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                  >
-                    <Compass className="w-4 h-4 mr-2" />
-                    Browse Clubs
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
+ 
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">

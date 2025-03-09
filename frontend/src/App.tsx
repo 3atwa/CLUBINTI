@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Home } from './pages/Home';
 import { Explore } from './pages/Explore';
@@ -11,8 +11,10 @@ import { Register } from './pages/Register';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeToggle } from './components/ThemeToggle';
+import { useAuth } from './context/AuthContext';
 
 function App() {
+  
   return (
     <ThemeProvider>
       <AuthProvider>
@@ -29,13 +31,14 @@ function App() {
 }
 
 function MainLayout() {
+  const { isAuthenticated, user } = useAuth();
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/explore" element={<Explore />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={isAuthenticated? <Profile />: <Navigate to='/login' />} />
         <Route path="/club/:id" element={<ClubProfile />} />
         <Route path="/top-clubs" element={<TopClubs />} />
         <Route path="/settings" element={<Settings />} />
