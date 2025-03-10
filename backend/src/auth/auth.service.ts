@@ -47,7 +47,7 @@ export class AuthService {
 
   async login(
     loginData: AuthDto,
-  ): Promise<{ message: string; access_token: string;user: User }> {
+  ): Promise<{ message: string; access_token: string;user: Partial<User> }> {
     const user = await this.userModel
       .findOne({ email: loginData.email })
       .exec();
@@ -58,14 +58,14 @@ export class AuthService {
 
     if (await this.comparePassword(loginData.password, user.password)) {
       // Call the updated signToken method and await the result
-      const { message, access_token } = await this.signToken(
+      const {message, access_token} = await this.signToken(
         user._id.toString(),
         user.name,
         user.email,
         user.role,
       );
-
-      return { message, access_token, user };
+      const { _id, password, ...userWithoutSensitiveData } = user.toObject();
+      return { message, access_token, user: userWithoutSensitiveData };
     } else {
       throw new HttpException('Incorrect password', HttpStatus.UNAUTHORIZED);
     }
@@ -130,9 +130,11 @@ export class AuthService {
       const payload = this.jwt.verify(token, {
         secret: 'CLUBENTY1StheBE5TPF4ever',
       });
+      console.log(payload);
 
       // Now you have the decoded payload
       return payload;
+
     } catch (error) {
       // Handle errors (e.g., token is invalid)
       throw new UnauthorizedException('Invalid token');

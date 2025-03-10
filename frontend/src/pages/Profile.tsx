@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import  { useState, useEffect } from 'react';
 import { UserProfile } from '../types';
 import { BackButton } from '../components/BackButton';
 import { Link } from 'react-router-dom';
@@ -99,9 +99,21 @@ const mockProfile: UserProfile = {
 
 export function Profile() {
   const { isAuthenticated, user } = useAuth();
-  const [profile] = useState(isAuthenticated && user ? user : mockProfile);
+  const [profile, setProfile] = useState(isAuthenticated && user ? user : mockProfile);
   const [showPendingMembers, setShowPendingMembers] = useState(false);
   const [activeTab, setActiveTab] = useState<'managed' | 'joined'>('managed');
+
+  
+  useEffect(() => {
+    if (isAuthenticated) {
+        const user = localStorage.getItem('user');
+        setProfile(JSON.parse(user));
+    } else {
+      setProfile(mockProfile);
+    }
+  }, [isAuthenticated]); // ✅ Ensure `isAuthenticated` is a dependency
+  
+
 
   const handleAcceptMember = (clubId: string, memberId: string) => {
     // In a real app, this would update the backend

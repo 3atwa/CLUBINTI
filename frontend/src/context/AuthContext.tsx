@@ -32,6 +32,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, []);
 
+
+const validateToken =async (token: string) => {
+  try {
+    const response = await fetch('http://localhost:3002/auth/validateToken', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    });
+    if (!response.ok) {
+      throw new Error('Invalid token');
+    }
+    const data = await response.json();
+    setUser(data.user);
+    return data;
+  }
+  catch (error) {
+    console.error('Token validation error:', error);
+    throw error; // Re-throw the error to handle it in the component
+  }
+}
+
+
   const login = async (email: string, password: string) => {
     try {
       const response = await fetch('http://localhost:3002/auth/login', {
@@ -45,15 +67,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       const data = await response.json();
-      const { message,access_token, user } = data; // Assuming the backend returns a token and user data
+      const { message, access_token, user } = data; // Assuming the backend returns a token and user data
   
       // Save the token and user data in localStorage
       localStorage.setItem('access_token', access_token);
       localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('message', message);
   
       // Update the auth state
       setIsAuthenticated(true);
-      setUser(user);
     } catch (error) {
       console.error('Login error:', error);
       throw error; // Re-throw the error to handle it in the component

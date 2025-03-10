@@ -7,6 +7,9 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto, RegisterDto } from './dto';
+import { Get, Request, UseGuards } from '@nestjs/common';
+
+import { User } from '../model/user.model';
 
 @Controller('auth')
 export class AuthController {
@@ -31,9 +34,9 @@ export class AuthController {
   async login(@Body() loginData: AuthDto) {
     try {
       // Call AuthService instance method
-      const { message, access_token } = await this.authService.login(loginData);
+      const { message, access_token, user } = await this.authService.login(loginData);
 
-      return { message, access_token };
+      return { message, access_token, user };
     } catch (error) {
       throw error;
     }
@@ -70,4 +73,7 @@ export class AuthController {
       throw error;
     }
   }
+ 
+
+
 }
