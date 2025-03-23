@@ -59,4 +59,12 @@ export class UserService {
   async updateUserRole(userId: string, newRole: string): Promise<User> {
     return await this.userModel.findByIdAndUpdate(userId, { role: newRole });
   }
+
+  async getTotalUsersCount(searchQuery: string, searchCategory: string): Promise<number> {
+    // Implementation here
+    const count = await this.userModel.countDocuments({
+      // Add search criteria here
+    }).exec();
+    return count;
+  }
 }

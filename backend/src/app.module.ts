@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ClubModule } from './club/club.module';
+import { CommentsModule } from './comments/comment.module';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { ClubModule } from './club/club.module';
     }),
     MongooseModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
-        uri:'mongodb+srv://CLUBINTI:fIUjuj3sAwRaiLVK@clubinti.mg8mq.mongodb.net/?retryWrites=true&w=majority&appName=CLUBINTI',
+        uri:'mongodb+srv://CLUBINTI:fIUjuj3sAwRaiLVK@clubinti.mg8mq.mongodb.net/',
 
         
       }),
@@ -21,6 +22,7 @@ import { ClubModule } from './club/club.module';
     UserModule,
     AuthModule,
     ClubModule,
+    CommentsModule,
 
   ],
   controllers: [],
