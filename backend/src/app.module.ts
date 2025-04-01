@@ -4,11 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ClubModule } from './club/club.module';
-<<<<<<< HEAD
 import { PostsModule } from './posts/posts.module';
-=======
-import { CommentsModule } from './comments/comment.module';
->>>>>>> 7f6617df5b4f302ad2aa3ab88b2231afc213211c
 
 @Module({
   imports: [
@@ -26,11 +22,7 @@ import { CommentsModule } from './comments/comment.module';
     UserModule,
     AuthModule,
     ClubModule,
-<<<<<<< HEAD
     PostsModule
-=======
-    CommentsModule,
->>>>>>> 7f6617df5b4f302ad2aa3ab88b2231afc213211c
 
   ],
   controllers: [],
