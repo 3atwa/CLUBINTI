@@ -1,5 +1,6 @@
 // src/club/dto/create-club.dto.ts
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+
 
 export class CreateClubDto {
   @IsString()

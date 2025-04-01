@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ClubModule } from './club/club.module';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ClubModule } from './club/club.module';
     UserModule,
     AuthModule,
     ClubModule,
+    PostsModule
 
   ],
   controllers: [],

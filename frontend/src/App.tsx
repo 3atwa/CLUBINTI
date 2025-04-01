@@ -31,7 +31,7 @@ function App() {
 }
 
 function MainLayout() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
       <Navbar />

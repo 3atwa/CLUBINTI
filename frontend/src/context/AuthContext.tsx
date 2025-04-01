@@ -25,7 +25,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
   
       if (token ) {
+        try{
+        validateToken(token)
         setIsAuthenticated(true);
+        }catch(err){
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('user');
+          setIsAuthenticated(false);
+          setUser(null);
+        }
       }
     };
   

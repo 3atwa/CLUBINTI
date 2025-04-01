@@ -135,11 +135,13 @@ export class ClubService {
 
 
   async createPost(clubId: string, createPostDto: CreatePostDto): Promise<Post> {
-    const { content, authorId } = createPostDto;
+    const { title,description ,image, authorId } = createPostDto;
 
     // Create the post
     const newPost = new this.postModel({
-      content,
+      title,
+      description,
+      image,
       clubId,
       authorId,
     });

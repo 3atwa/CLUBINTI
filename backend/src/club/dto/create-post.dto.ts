@@ -1,12 +1,20 @@
-// src/dto/create-post.dto.ts
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsUrl } from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
   @IsNotEmpty()
-  content: string;
+  title!: string;
 
   @IsString()
   @IsNotEmpty()
-  authorId: string;
+  description!: string;
+
+  @IsUrl()
+  @IsOptional()
+  image?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  authorId !: string;
+
 }
