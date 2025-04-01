@@ -265,24 +265,6 @@ export function ClubProfile() {
             <p className="text-gray-600 dark:text-gray-300">{clubData.description}</p>
           </div>
 
-          {/* Common Members */}
-          {clubData.commonMembers && clubData.commonMembers.length > 0 && (
-            <div className="mt-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Common Members</h2>
-              <div className="flex items-center space-x-2">
-                {clubData.commonMembers.map((member) => (
-                  <div key={member.id} className="flex flex-col items-center">
-                    <img
-                      src={member.avatar}
-                      alt={member.name}
-                      className="w-12 h-12 rounded-full"
-                    />
-                    <span className="text-sm text-gray-600 dark:text-gray-300 mt-1">{member.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Posts Section */}
