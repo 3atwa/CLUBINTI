@@ -131,6 +131,7 @@ export function Explore() {
               </button>
             ))}
           </div>
+          
 
           {/* No results message */}
           {filteredClubs.length === 0 && (
