@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import { UserProfile, Club } from '../types';
+import  { useState, useEffect } from 'react';
+import { UserProfile } from '../types';
 import { BackButton } from '../components/BackButton';
 import { EditProfileModal } from '../components/EditProfil';
 import { Link } from 'react-router-dom';
-import { Users, Bell, Mail, Calendar, MapPin, Briefcase, Award, Settings, ChevronRight, Shield, User as UserIcon, Compass } from 'lucide-react';
+import { Users, Bell, Mail, Calendar, MapPin, Briefcase, Award, Settings, ChevronRight, Shield, User as UserIcon, Compass, LogIn, UserPlus } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const mockProfile: UserProfile = {
   id: '1',
   name: 'John Doe',
   email: 'john@example.com',
-  avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80',
+  avatar: '',
   bio: 'Software developer and photography enthusiast. Love to participate in tech and creative clubs.',
   location: 'San Francisco, CA',
   occupation: 'Software Engineer',
@@ -98,10 +99,26 @@ const mockProfile: UserProfile = {
 };
 
 export function Profile() {
-  const [profile, setProfile] = useState(mockProfile);
+  const { isAuthenticated, user } = useAuth();
+  const [profile, setProfile] = useState(isAuthenticated && user ? user : mockProfile);
   const [showPendingMembers, setShowPendingMembers] = useState(false);
   const [activeTab, setActiveTab] = useState<'managed' | 'joined'>('managed');
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
+
+  const handleProfileUpdate = (updatedProfile: Partial<UserProfile>) => {
+    setProfile({ ...profile, ...updatedProfile });
+  };
+  
+  useEffect(() => {
+    if (isAuthenticated) {
+        const user = localStorage.getItem('user');
+        setProfile(JSON.parse(user));
+    } else {
+      setProfile(mockProfile);
+    }
+  }, [isAuthenticated]); // ✅ Ensure `isAuthenticated` is a dependency
+  
+
 
   const handleAcceptMember = (clubId: string, memberId: string) => {
     // In a real app, this would update the backend
@@ -113,15 +130,13 @@ export function Profile() {
     console.log(`Rejected member ${memberId} for club ${clubId}`);
   };
 
-  const handleProfileUpdate = (updatedProfile: Partial<UserProfile>) => {
-    setProfile({ ...profile, ...updatedProfile });
-  };
-
   // Combine all clubs where user has management roles
-  const managedClubs = [...(profile.ownedClubs || []), ...(profile.moderatedClubs || [])];
+  const managedClubs = [...profile.ownedClubs, ...(profile.moderatedClubs || [])];
 
   // Calculate total points
   const totalPoints = Object.values(profile.points).reduce((sum, points) => sum + points, 0);
+
+ 
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
@@ -392,7 +407,6 @@ export function Profile() {
                           <img
                             src={club.logo}
                             alt={club.name}
-                            
                             className="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-gray-700 shadow-sm"
                           />
                           <div className="ml-4">
@@ -458,13 +472,13 @@ export function Profile() {
           )}
         </div>
       </main>
-
       <EditProfileModal
         isOpen={isEditProfileModalOpen}
         onClose={() => setIsEditProfileModalOpen(false)}
         profile={profile}
         onSave={handleProfileUpdate}
       />
+
     </div>
   );
 }
