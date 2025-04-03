@@ -3,7 +3,7 @@ import { UserProfile } from '../types';
 import { BackButton } from '../components/BackButton';
 import { EditProfileModal } from '../components/EditProfil';
 import { Link } from 'react-router-dom';
-import { Users, Bell, Mail, Calendar, MapPin, Briefcase, Award, Settings, ChevronRight, Shield, User as UserIcon, Compass, LogIn, UserPlus } from 'lucide-react';
+import { Users, Bell, Mail, Calendar, MapPin, Briefcase, Award, Settings, ChevronRight, Shield, User as UserIcon, Compass} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const mockProfile: UserProfile = {
@@ -112,7 +112,9 @@ export function Profile() {
   useEffect(() => {
     if (isAuthenticated) {
         const user = localStorage.getItem('user');
+        if(user){
         setProfile(JSON.parse(user));
+        }
     } else {
       setProfile(mockProfile);
     }
