@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ClubModule } from './club/club.module';
 import { PostsModule } from './posts/posts.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { PostsModule } from './posts/posts.module';
     UserModule,
     AuthModule,
     ClubModule,
-    PostsModule
+    PostsModule,
+    ProfileModule
 
   ],
   controllers: [],

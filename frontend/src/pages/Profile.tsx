@@ -112,7 +112,9 @@ export function Profile() {
   useEffect(() => {
     if (isAuthenticated) {
         const user = localStorage.getItem('user');
-        setProfile(JSON.parse(user));
+        if (user) {
+          setProfile(JSON.parse(user));
+        }
     } else {
       setProfile(mockProfile);
     }
