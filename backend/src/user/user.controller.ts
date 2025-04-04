@@ -9,11 +9,15 @@ import {
   HttpException,
   HttpStatus,
   Put,
+  Patch,
+  Req,
+  ForbiddenException
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UpdateUserDto } from './dto';
+import { UpdateUserDto ,UserUpdateDto} from './dto';
 import { User } from 'src/model/user.model';
 import { AdminGuard, JwtGuard } from 'src/auth/guard';
+import { ApiTags, ApiOperation, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 
 @UseGuards(JwtGuard)
 @Controller('user')
@@ -78,4 +82,36 @@ export class UserController {
   ): Promise<User> {
     return await this.userService.updateUser(id, updateUserDto);
   }
+
+
+  @UseGuards(JwtGuard)
+  @Patch('/update/:id')
+  @ApiOperation({ summary: 'Update user profile (only self)' }) // Describes the endpoint in Swagger
+  @ApiBearerAuth('access-token') // Adds Authorization header (JWT)
+  @ApiBody({ type: UpdateUserDto }) // Defines the expected request body
+    async updateUserBySelf(
+    @Param('id') id: string,
+    @Body() userUpdateDto: Partial<UserUpdateDto>,
+    @Req() req: any, // Get user from JWT token
+  ): Promise<User> {
+    // Ensure user can only update their own profile
+
+  
+    // Restrict updatable fields
+    const allowedUpdates = ['name', 'avatar', 'bio', 'location', 'occupation'];
+    const filteredUpdates: Partial<UserUpdateDto> = {};
+  
+    for (const key of allowedUpdates) {
+      if (userUpdateDto[key] !== undefined) {
+        filteredUpdates[key] = userUpdateDto[key];
+      }
+    }
+  
+    return await this.userService.userUpdate(id, filteredUpdates);
+  }
+  
+
+
 }
+
+

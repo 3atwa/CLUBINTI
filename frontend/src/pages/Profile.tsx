@@ -7,7 +7,7 @@ import { Users, Bell, Mail, Calendar, MapPin, Briefcase, Award, Settings, Chevro
 import { useAuth } from '../context/AuthContext';
 
 const mockProfile: UserProfile = {
-  id: '1',
+  _id: '1',
   name: 'John Doe',
   email: 'john@example.com',
   avatar: '',
@@ -53,7 +53,7 @@ const mockProfile: UserProfile = {
       role: 'Owner',
       pendingMembers: [
         {
-          id: '2',
+          _id: '2',
           name: 'Alice Johnson',
           email: 'alice@example.com',
           avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80',
@@ -112,20 +112,14 @@ export function Profile() {
   useEffect(() => {
     if (isAuthenticated) {
         const user = localStorage.getItem('user');
-<<<<<<< HEAD
         if(user){
         setProfile(JSON.parse(user));
-=======
-        if (user) {
-          setProfile(JSON.parse(user));
->>>>>>> ad168bae35bf45027ad9ecf59d7a382f8886a10e
         }
     } else {
       setProfile(mockProfile);
     }
   }, [isAuthenticated]); // ✅ Ensure `isAuthenticated` is a dependency
   
-
 
   const handleAcceptMember = (clubId: string, memberId: string) => {
     // In a real app, this would update the backend
@@ -164,7 +158,7 @@ export function Profile() {
               <div className="flex flex-col sm:flex-row sm:items-end -mt-24 mb-4 gap-6">
                 <div className="relative">
                   <img
-                    src={profile.avatar}
+                    src={profile.avatar || 'https://www.gravatar.com/avatar/?d=mp'}
                     alt={profile.name}
                     className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white dark:border-gray-800 shadow-md object-cover"
                   />
@@ -329,7 +323,7 @@ export function Profile() {
                             <h5 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Pending Requests</h5>
                             <div className="space-y-3">
                               {club.pendingMembers.map((member) => (
-                                <div key={member.id} className="flex items-center justify-between">
+                                <div key={member._id} className="flex items-center justify-between">
                                   <div className="flex items-center">
                                     <img
                                       src={member.avatar}
@@ -340,13 +334,13 @@ export function Profile() {
                                   </div>
                                   <div className="flex gap-2">
                                     <button
-                                      onClick={() => handleAcceptMember(club.id, member.id)}
+                                      onClick={() => handleAcceptMember(club.id, member._id)}
                                       className="px-3 py-1 text-xs text-white bg-green-500 rounded hover:bg-green-600"
                                     >
                                       Accept
                                     </button>
                                     <button
-                                      onClick={() => handleRejectMember(club.id, member.id)}
+                                      onClick={() => handleRejectMember(club.id, member._id)}
                                       className="px-3 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600"
                                     >
                                       Reject

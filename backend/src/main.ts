@@ -23,6 +23,14 @@ async function bootstrap() {
   .setTitle('Club Intelli API')
   .setDescription('The Club Intelli API description')
   .setVersion('1.0')
+  .addBearerAuth( // 👈 This enables the "Authorize" button
+    {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+    },
+    'access-token', // 👈 Optional: give it a name
+  )
   .build();
   const document = SwaggerModule.createDocument(app, options);
 

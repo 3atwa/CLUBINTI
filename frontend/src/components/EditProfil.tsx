@@ -12,18 +12,47 @@ interface EditProfileModalProps {
 export function EditProfileModal({ isOpen, onClose, profile, onSave }: EditProfileModalProps) {
   const [formData, setFormData] = useState({
     name: profile.name,
-    email: profile.email,
     bio: profile.bio || '',
     location: profile.location || '',
     occupation: profile.occupation || '',
     avatar: profile.avatar,
-    coverImage: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
-    onClose();
+    
+    // Get token from localStorage
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      alert('Unauthorized: Please log in again.');
+      return;
+    }
+    console.log('Profile' ,profile._id); 
+    console.log(formData);
+    try {
+      // Make API request to update the profile
+      const response = await fetch(`http://localhost:3002/user/update/${profile._id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Add token to the headers
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      const updatedProfile = await response.json();
+      onSave(updatedProfile); // Update UI with the new profile data
+      localStorage.setItem('user_profile', JSON.stringify(updatedProfile)); // Update the profile in localStorage
+
+      onClose();
+    } catch (error) {
+      console.error('Update failed:', error);
+      alert('Failed to update profile. Please try again.');
+    }
   };
 
   if (!isOpen) return null;
@@ -77,7 +106,7 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }: EditProfi
               </div>
             </div>
 
-            {/* Cover Image */}
+            {/* Cover Image 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Cover Image
@@ -100,7 +129,7 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }: EditProfi
                 </div>
               </div>
             </div>
-
+*/}
             {/* Basic Information */}
             <div className="grid grid-cols-1 gap-6">
               <div>
@@ -116,18 +145,6 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }: EditProfi
                 />
               </div>
 
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                />
-              </div>
 
               <div>
                 <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300">

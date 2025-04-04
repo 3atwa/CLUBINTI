@@ -43,7 +43,7 @@ export interface Comment {
 }
 
 export interface UserProfile {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   avatar: string;
