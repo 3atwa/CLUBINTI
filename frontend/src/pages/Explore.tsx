@@ -3,9 +3,11 @@ import { Club } from '../types';
 import { Search, Plus, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CreateClubModal } from '../components/CreateClubModal';
+import { useAuth } from '../context/AuthContext';
 
 export function Explore() {
   const [searchTerm, setSearchTerm] = useState('');
+  const { isAuthenticated} = useAuth();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [clubsList, setClubsList] = useState<Club[]>([]);
   const [filteredClubs, setFilteredClubs] = useState<Club[]>([]);
@@ -15,20 +17,40 @@ export function Explore() {
 
   const categories = ['All', 'Arts', 'Academic', 'Technology', 'Social', 'Sports', 'Other'];
 
-  const handleCreateClub = (clubData: any) => {
-    const newClub: Club = {
-      id: String(clubsList.length + 1),
-      name: clubData.name,
-      description: clubData.description,
-      coverImage: clubData.coverImage,
-      logo: clubData.coverImage, // Using cover image as logo for simplicity
-      memberCount: 1,
-      category: clubData.category,
-      activities: []
+  const handleCreateClub = async (clubData: any) => {
+    const userString = localStorage.getItem('user');
+  
+    if (!userString) {
+      alert('You need to be logged in to create clubs');
+      return;
+    }
+  
+    const user = JSON.parse(userString); // ✅ Parse the user from localStorage
+  
+    const clubDataWithOwner = {
+      ...clubData,
+      ownerId: user._id, // ✅ Extract ownerId after parsing
     };
-    
-    setClubsList([...clubsList, newClub]);
+  
+    try {
+      const response = await fetch('http://localhost:3002/clubs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(clubDataWithOwner),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to create club');
+      }
+  
+      const newClub = await response.json(); // Backend returns the created club
+      setClubsList((prev) => [...prev, newClub]); // Update UI with new club
+    } catch (error) {
+      console.error('Error creating club:', error);
+    }
   };
+  
+  
 
 
 
@@ -104,7 +126,7 @@ export function Explore() {
                   </button>
                 )}
               </div>
-
+                { isAuthenticated &&
               <button
                 onClick={() => setIsCreateModalOpen(true)}
                 className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
@@ -112,6 +134,7 @@ export function Explore() {
                 <Plus size={20} className="mr-2" />
                 Create Club
               </button>
+}
             </div>
           </div>
 
@@ -151,7 +174,7 @@ export function Explore() {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredClubs.map((club) => (
-              <Link key={club.id} to={`/club/${club.id}`} className="block group">
+              <Link key={club._id} to={`/club/${club._id}`} className="block group">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="relative">
                     <img
@@ -183,12 +206,13 @@ export function Explore() {
           </div>
         </div>
       </main>
+          <CreateClubModal
+      isOpen={isCreateModalOpen}
+      onClose={() => setIsCreateModalOpen(false)}
+      onSubmit={handleCreateClub}  // ✅ Correct prop name
+    />
 
-      <CreateClubModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={handleCreateClub}
-      />
+
     </div>
   );
 }

@@ -17,7 +17,7 @@ const mockProfile: UserProfile = {
   joinDate: '2023-01-15',
   joinedClubs: [
     {
-      id: '1',
+      _id: '1',
       name: 'Photography Club',
       description: 'For photography enthusiasts and beginners alike.',
       coverImage: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?auto=format&fit=crop&q=80',
@@ -28,7 +28,7 @@ const mockProfile: UserProfile = {
       role: 'Member'
     },
     {
-      id: '3',
+      _id: '3',
       name: 'Book Club',
       description: 'A community for book lovers to discuss and recommend books.',
       coverImage: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80',
@@ -41,7 +41,7 @@ const mockProfile: UserProfile = {
   ],
   ownedClubs: [
     {
-      id: '2',
+      _id: '2',
       name: 'Tech Innovators',
       description: 'A community of tech enthusiasts building the future.',
       coverImage: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80',
@@ -64,7 +64,7 @@ const mockProfile: UserProfile = {
       ]
     },
     {
-      id: '4',
+      _id: '4',
       name: 'Coding Workshop',
       description: 'Weekly coding sessions and hackathons for developers.',
       coverImage: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80',
@@ -78,7 +78,7 @@ const mockProfile: UserProfile = {
   ],
   moderatedClubs: [
     {
-      id: '5',
+      _id: '5',
       name: 'Design Thinkers',
       description: 'Exploring design principles and creative solutions.',
       coverImage: 'https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&q=80',
@@ -267,7 +267,7 @@ export function Profile() {
               {managedClubs.length > 0 ? (
                 managedClubs.map((club) => (
                   <div
-                    key={club.id}
+                    key={club._id}
                     className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all"
                   >
                     <div className="sm:flex">
@@ -334,13 +334,13 @@ export function Profile() {
                                   </div>
                                   <div className="flex gap-2">
                                     <button
-                                      onClick={() => handleAcceptMember(club.id, member._id)}
+                                      onClick={() => handleAcceptMember(club._id, member._id)}
                                       className="px-3 py-1 text-xs text-white bg-green-500 rounded hover:bg-green-600"
                                     >
                                       Accept
                                     </button>
                                     <button
-                                      onClick={() => handleRejectMember(club.id, member._id)}
+                                      onClick={() => handleRejectMember(club._id, member._id)}
                                       className="px-3 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600"
                                     >
                                       Reject
@@ -354,17 +354,17 @@ export function Profile() {
                         
                         <div className="mt-4 flex flex-wrap gap-3">
                           <Link
-                            to={`/club/${club.id}`}
+                            to={`/club/${club._id}`}
                             className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
                           >
                             <Settings className="w-4 h-4 mr-2" />
                             Manage Club
                           </Link>
                           
-                          {profile.points[club.id] && (
+                          {profile.points[club._id] && (
                             <div className="inline-flex items-center px-4 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 rounded-lg">
                               <Award className="w-4 h-4 mr-2" />
-                              {profile.points[club.id]} points
+                              {profile.points[club._id]} points
                             </div>
                           )}
                         </div>
@@ -392,7 +392,7 @@ export function Profile() {
               {profile.joinedClubs.length > 0 ? (
                 profile.joinedClubs.map((club) => (
                   <div
-                    key={club.id}
+                    key={club._id}
                     className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all"
                   >
                     <div className="sm:flex">
@@ -431,15 +431,15 @@ export function Profile() {
                           </div>
                           
                           <div className="flex items-center gap-3">
-                            {profile.points[club.id] && (
+                            {profile.points[club._id] && (
                               <div className="inline-flex items-center text-amber-700 dark:text-amber-400">
                                 <Award className="w-4 h-4 mr-1" />
-                                {profile.points[club.id]} points
+                                {profile.points[club._id]} points
                               </div>
                             )}
                             
                             <Link
-                              to={`/club/${club.id}`}
+                              to={`/club/${club._id}`}
                               className="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
                             >
                               View Club

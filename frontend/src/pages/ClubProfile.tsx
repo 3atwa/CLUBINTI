@@ -5,6 +5,7 @@ import { Users, Heart, MessageCircle, Share2, Plus, Settings, Bell, BellOff } fr
 import { BackButton } from '../components/BackButton';
 import { CreatePostModal } from '../components/CreatePostModal';
 import { CommentSection } from '../components/CommentSection';
+import { useAuth } from '../context/AuthContext';
 
 export function ClubProfile() {
   const { id } = useParams<{ id: string }>();
@@ -51,6 +52,41 @@ export function ClubProfile() {
       fetchClubData();
     }
   }, [id]);
+
+
+  const handleCreatePost = async (postData: any) => {
+    const userString = localStorage.getItem('user');
+  
+    if (!userString) {
+      alert('You need to be logged in to create clubs');
+      return;
+    }
+  
+    const user = JSON.parse(userString); // ✅ Parse the user from localStorage
+    if (!postData.image) {
+      delete postData.image;
+    }
+    try {
+      const response = await fetch(`http://localhost:3002/clubs/${id}/posts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...postData, authorId: user._id }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create post');
+      }
+
+      const newPost = await response.json();
+      setPosts((prev) => [newPost, ...prev]);
+      setIsCreatePostModalOpen(false);
+    } catch (error) {
+      console.error('Error creating post:', error);
+    }
+  };
+
+
+
 
   const isOwner = clubData?.role === 'Owner';
 
@@ -162,6 +198,34 @@ export function ClubProfile() {
                       <img src={post.image} alt={post.title} className="mt-4 w-full rounded-lg" />
                     )}
                   </div>
+                  {/* Post Actions */}
+                       <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <button
+                            className={`flex items-center space-x-1 hover:text-red-500 transition-colors`}
+                          >
+                            <Heart
+                              size={20}
+                            />
+                          </button>
+                          <button 
+                            className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
+                          >
+                            <MessageCircle size={20} />
+                            <span>
+                              {post.comments && post.comments.length > 0 
+                                ? `Comments (${post.comments.length})` 
+                                : 'Comment'}
+                            </span>
+                          </button>
+                          <button className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
+                            <Share2 size={20} />
+                            <span>Share</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                 </div>
               ))}
             </div>
@@ -170,7 +234,11 @@ export function ClubProfile() {
           )}
         </div>
       </div>
-
+      <CreatePostModal
+        isOpen={isCreatePostModalOpen}
+        onClose={() => setIsCreatePostModalOpen(false)}
+        onSubmit={handleCreatePost}
+      />
     </div>
   );
 }

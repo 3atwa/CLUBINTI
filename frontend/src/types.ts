@@ -1,5 +1,5 @@
 export interface Club {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   coverImage: string;

@@ -110,7 +110,7 @@ export class ClubService {
 
   // Get club details
   async getClub(clubId: string): Promise<Club> {
-    const club = await this.clubModel.findOne({ id: clubId }).exec();
+    const club = await this.clubModel.findOne({ _id: clubId }).exec();
     if (!club) {
       throw new Error('Club not found');
     }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Camera } from 'lucide-react';
 
 interface CreateClubModalProps {
   isOpen: boolean;
@@ -9,6 +9,7 @@ interface CreateClubModalProps {
     description: string;
     category: string;
     coverImage: string;
+    logo: string;
   }) => void;
 }
 
@@ -18,6 +19,7 @@ export function CreateClubModal({ isOpen, onClose, onSubmit }: CreateClubModalPr
     description: '',
     category: 'Academic',
     coverImage: '',
+    logo: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -43,6 +45,38 @@ export function CreateClubModal({ isOpen, onClose, onSubmit }: CreateClubModalPr
 
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
+          <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              logo
+              </label>
+              <div className="flex items-center space-x-6">
+                <div className="relative">
+                  <img
+                    src={formData.logo}
+                    alt="Profile"
+                    className="w-24 h-24 rounded-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    className="absolute bottom-0 right-0 bg-indigo-600 p-2 rounded-full text-white hover:bg-indigo-700"
+                  >
+                    <Camera size={16} />
+                  </button>
+                </div>
+                <div className="flex-1">
+                  <input
+                    type="url"
+                    value={formData.logo}
+                    onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
+                    placeholder="Enter image URL"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  />
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Enter the URL of your profile picture
+                  </p>
+                </div>
+              </div>
+            </div>
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Club Name
