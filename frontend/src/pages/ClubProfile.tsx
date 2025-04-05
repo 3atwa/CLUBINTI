@@ -12,7 +12,6 @@ export function ClubProfile() {
   const [clubData, setClubData] = useState<Club | null>(null);
   const [posts, setPosts] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isJoined, setIsJoined] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [expandedComments, setExpandedComments] = useState<string[]>([]);
@@ -157,16 +156,6 @@ export function ClubProfile() {
                 </button>
               ) : (
                 <div className="flex flex-col sm:flex-row gap-2">
-                  <button
-                    onClick={() => setIsJoined(!isJoined)}
-                    className={`${
-                      isJoined
-                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
-                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                    } px-6 py-2 rounded-full font-semibold transition-colors`}
-                  >
-                    {isJoined ? 'Joined' : 'Join Club'}
-                  </button>
                   
                   <button
                     onClick={() => setIsFollowing(!isFollowing)}
@@ -194,7 +183,7 @@ export function ClubProfile() {
         <div className="mt-8">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Club Posts</h2>
-            {(isJoined || isOwner) && (
+            {(isOwner) && (
               <button
                 onClick={() => setIsCreatePostModalOpen(true)}
                 className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"

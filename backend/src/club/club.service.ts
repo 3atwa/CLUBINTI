@@ -26,14 +26,32 @@ export class ClubService {
 
   // Create a new club
   async createClub(createClubDto: CreateClubDto): Promise<Club> {
+    const { ownerId, ...clubData } = createClubDto;
+  
+    // Step 1: Create the new club
     const newClub = new this.clubModel({
-      id: this.generateClubId(), // Generate a unique ID for the club
-      ...createClubDto,
-      memberCount: 1, // Start with the owner as the first member
+      id: this.generateClubId(),
+      ...clubData,
+      ownerId,
+      memberCount: 1,
       role: 'Owner',
     });
-    return newClub.save();
+    const savedClub = await newClub.save();
+  
+    // Step 2: Update the user's ownedClubs array
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      ownerId,
+      { $push: { ownedClubs: savedClub } },
+      { new: true }
+    );
+  
+    if (!updatedUser) {
+      throw new Error('User not found or failed to update ownedClubs');
+    }
+  
+    return savedClub;
   }
+  
 
   // Add a member to the club
   async addMember(clubId: string, addMemberDto: AddMemberDto): Promise<Club> {
