@@ -226,6 +226,16 @@ export function ClubProfile() {
                         </div>
                       </div>
                     </div>
+                    {/* Comment Section */}
+                    {expandedComments.includes(post.id) && (
+                      <div className="px-4 pb-4">
+                        <CommentSection 
+                          postId={post.id}
+                          comments={post.comments || []}
+                          onAddComment={handleCreatePost}
+                        />
+                      </div>
+                    )}
                 </div>
               ))}
             </div>
