@@ -5,7 +5,7 @@ import { Users, Heart, MessageCircle, Share2, Plus, Settings, Bell, BellOff } fr
 import { BackButton } from '../components/BackButton';
 import { CreatePostModal } from '../components/CreatePostModal';
 import { CommentSection } from '../components/CommentSection';
-import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 export function ClubProfile() {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +16,11 @@ export function ClubProfile() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [expandedComments, setExpandedComments] = useState<string[]>([]);
+
+
+  var isOwner = false;
+   const userString = localStorage.getItem('user');
+   const user = userString? JSON.parse(userString) : null;
 
   useEffect(() => {
     const fetchClubData = async () => {
@@ -48,10 +53,28 @@ export function ClubProfile() {
       }
     };
 
+
     if (id) {
       fetchClubData();
     }
   }, [id]);
+
+  const toggleComments = (activityId: string) => {
+    if (expandedComments.includes(activityId)) {
+      setExpandedComments(expandedComments.filter(id => id !== activityId));
+    } else {
+      setExpandedComments([...expandedComments, activityId]);
+    }
+  };
+
+  if(clubData && user){
+    if(clubData.ownerId === user._id){
+      isOwner = true;
+    }
+  }
+  else{
+     isOwner = false;
+  }
 
 
   const handleCreatePost = async (postData: any) => {
@@ -87,8 +110,6 @@ export function ClubProfile() {
 
 
 
-
-  const isOwner = clubData?.role === 'Owner';
 
   if (isLoading) {
     return <div className="text-center text-gray-600 dark:text-gray-300">Loading...</div>;
@@ -188,44 +209,81 @@ export function ClubProfile() {
             <div className="space-y-6">
               {posts.map((post) => (
                 <div key={post.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">{post.title}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(post.date).toLocaleString()}
-                    </p>
-                    <p className="mt-4 text-gray-800 dark:text-gray-200">{post.description}</p>
-                    {post.image && (
-                      <img src={post.image} alt={post.title} className="mt-4 w-full rounded-lg" />
-                    )}
-                  </div>
-                  {/* Post Actions */}
-                       <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <button
-                            className={`flex items-center space-x-1 hover:text-red-500 transition-colors`}
-                          >
-                            <Heart
-                              size={20}
-                            />
-                          </button>
-                          <button 
-                            className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
-                          >
-                            <MessageCircle size={20} />
-                            <span>
-                              {post.comments && post.comments.length > 0 
-                                ? `Comments (${post.comments.length})` 
-                                : 'Comment'}
-                            </span>
-                          </button>
-                          <button className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
-                            <Share2 size={20} />
-                            <span>Share</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                  {/* Post Header */}
+                                      <div className="p-4 flex items-center">
+                                        <Link to={`/club/${post.clubId}`} className="flex items-center flex-1">
+                                          <img
+                                            src={clubData.coverImage}
+                                            alt={clubData.name}
+                                            className="w-12 h-12 rounded-full object-cover"
+                                          />
+                                          <div className="ml-3">
+                                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400">
+                                              {post.clubName}
+                                            </h3>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                              {new Date(post.date).toLocaleDateString('en-US', {
+                                                month: 'long',
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                              })}
+                                            </p>
+                                          </div>
+                                        </Link>
+                                        <Link
+                                          to={`/club/${post.clubId}`}
+                                          className="flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                                        >
+                                          <Users size={16} className="mr-1" />
+                                          <span>View Club</span>
+                                        </Link>
+                                      </div>
+                  
+                                      {/* Post Content */}
+                                      <div className="px-4 pb-3">
+                                        <p className="text-gray-800 dark:text-gray-200 whitespace-pre-line">{post.description}</p>
+                                      </div>
+                  
+                                      {post.image && (
+                                        <img
+                                          src={post.image}
+                                          alt={post.title}
+                                          className="w-full aspect-video object-cover"
+                                        />
+                                      )}
+                  
+                                      {/* Post Actions */}
+                                      <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
+                                        <div className="flex items-center justify-between">
+                                          <div className="flex items-center space-x-4">
+                                            <button
+                                              className={`flex items-center space-x-1  hover:text-red-500 transition-colors`}
+                                            >
+                                              <Heart
+                                                size={20}
+                                                className={post.isLiked ? 'fill-current' : ''}
+                                              />
+                                              <span>{post.likes}</span>
+                                            </button>
+                                            <button 
+                                              className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
+                                              onClick={() => toggleComments(post.id)}
+                                              >
+                                              <MessageCircle size={20} />
+                                              <span>
+                                                {post.comments && post.comments.length > 0 
+                                                  ? `Comments (${post.comments.length})` 
+                                                  : 'Comment'}
+                                              </span>
+                                            </button>
+                                            <button className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
+                                              <Share2 size={20} />
+                                              <span>Share</span>
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </div>
                     {/* Comment Section */}
                     {expandedComments.includes(post.id) && (
                       <div className="px-4 pb-4">
