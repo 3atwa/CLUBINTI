@@ -6,6 +6,7 @@ import { BackButton } from '../components/BackButton';
 import { CreatePostModal } from '../components/CreatePostModal';
 import { CommentSection } from '../components/CommentSection';
 import { Link } from 'react-router-dom';
+import { FollowButton } from '../components/FollowButton';
 
 export function ClubProfile() {
   const { id } = useParams<{ id: string }>();
@@ -50,6 +51,7 @@ export function ClubProfile() {
       } finally {
         setIsLoading(false);
       }
+
     };
 
 
@@ -57,6 +59,34 @@ export function ClubProfile() {
       fetchClubData();
     }
   }, [id]);
+
+
+  const token = localStorage.getItem('access_token');
+
+
+  useEffect(() => { 
+    // Fetch the user's followed clubs from the backend to check if the user is following this club
+    const checkFollowingStatus = async () => {
+      try {
+        const response = await fetch(`http://localhost:3002/user/user/${user._id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const userData = await response.json();
+        console.log(userData);
+        if (userData.followedClubs && userData.followedClubs.includes(clubData?._id)) {
+          setIsFollowing(true); // Set isFollowing if the club is in the followed clubs list
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    checkFollowingStatus();
+  }, [user._id, clubData?._id, token]);
+
+
+
+
 
   const toggleComments = (activityId: string) => {
     if (expandedComments.includes(activityId)) {
@@ -149,27 +179,23 @@ export function ClubProfile() {
               </div>
             </div>
             <div className="mt-4 sm:mt-0 flex items-center gap-3">
-              {isOwner ? (
-                <button className="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                  <Settings size={20} className="mr-2" />
-                  Manage Club
-                </button>
-              ) : (
-                <div className="flex flex-col sm:flex-row gap-2">
-                  
-                  <button
-                    onClick={() => setIsFollowing(!isFollowing)}
-                    className={`${
-                      isFollowing
-                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
-                        : 'border border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400'
-                    } px-6 py-2 rounded-full font-semibold transition-colors`}
-                  >
-                    {isFollowing ? 'Unfollow' : 'Follow'}
+                {isOwner ? (
+                  <button className="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                    <Settings size={20} className="mr-2" />
+                    Manage Club
                   </button>
-                </div>
-              )}
-            </div>
+                ) : (
+                  user && (
+                    <FollowButton
+                      userId={user._id}
+                      clubId={clubData._id}
+                      token={localStorage.getItem('access_token') || ''}
+                      isFollowing={isFollowing}
+                      onToggle={setIsFollowing}
+                    />
+                  )
+                )}
+              </div>
           </div>
 
           {/* Club Description */}

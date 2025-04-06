@@ -68,7 +68,7 @@ export class UserController {
     return await this.userService.updateUserRole(id, role);
   }
 
-  @UseGuards(JwtGuard, AdminGuard)
+  @UseGuards(JwtGuard)
   @Get('user/:id')
   async getUserById(@Param('id') id: string): Promise<User> {
     return await this.userService.getUserById(id);
@@ -110,7 +110,42 @@ export class UserController {
     return await this.userService.userUpdate(id, filteredUpdates);
   }
   
+  @Patch(':id/follow/:clubId')
+  @ApiOperation({ summary: 'Follow a club' })
+  @ApiBearerAuth('access-token')
+  async followClub(
+    @Param('id') userId: string,
+    @Param('clubId') clubId: string,
+    @Req() req: any,
+  ): Promise<User> {
+    const tokenUserId = req.user._id.toString(); // The user in the token
 
+    // Check if user is trying to follow for their own account
+    if (tokenUserId !== userId) {
+      throw new ForbiddenException('You cannot perform this action for another user');
+    }
+  
+    return await this.userService.followClub(userId, clubId);
+  }
+  
+  @Patch(':id/unfollow/:clubId')
+  @ApiOperation({ summary: 'Unfollow a club' })
+  @ApiBearerAuth('access-token')
+  async unfollowClub(
+    @Param('id') userId: string,
+    @Param('clubId') clubId: string,
+    @Req() req: any,
+  ): Promise<User> {
+    const tokenUserId = req.user._id.toString(); // The user in the token
+
+    // Check if user is trying to follow for their own account
+    if (tokenUserId !== userId) {
+      throw new ForbiddenException('You cannot perform this action for another user');
+    }
+  
+    return await this.userService.unfollowClub(userId, clubId);
+  }
+  
 
 }
 

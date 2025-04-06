@@ -4,7 +4,9 @@ import {
   IsNotEmpty,
   IsOptional,
   IsEnum,
-  MaxLength, IsUrl
+  MaxLength, IsUrl,
+  IsArray,
+  ArrayUnique
 } from 'class-validator';
 
 // DTO class for updating a user

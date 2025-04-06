@@ -46,6 +46,8 @@ export class User extends Document {
   @Prop({ type: [ClubSchema], default: [] })
   moderatedClubs: Club[];
   
+  @Prop()
+  followedClubs?: string[];
 
   @Prop({ type: Map, of: Number, default: {} })
   points: Map<string, number>; // Points per club, where the key is the club ID

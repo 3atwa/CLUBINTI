@@ -74,4 +74,27 @@ export class UserService {
     }).exec();
     return count;
   }
+
+
+
+  async followClub(userId: string, clubId: string): Promise<User> {
+    const user = await this.userModel.findByIdAndUpdate(
+      userId,
+      { $addToSet: { followedClubs: clubId } }, // $addToSet avoids duplicates
+      { new: true }
+    );
+    if (!user) throw new Error('User not found');
+    return user;
+  }
+  
+  async unfollowClub(userId: string, clubId: string): Promise<User> {
+    const user = await this.userModel.findByIdAndUpdate(
+      userId,
+      { $pull: { followedClubs: clubId } },
+      { new: true }
+    );
+    if (!user) throw new Error('User not found');
+    return user;
+  }
+  
 }
