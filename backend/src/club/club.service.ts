@@ -174,13 +174,15 @@ export class ClubService {
   }
 
   async createComment(postId: string, createCommentDto: CreateCommentDto): Promise<Comment> {
-    const { content, authorId } = createCommentDto;
-
+    const { content, authorId, userName, userAvatar } = createCommentDto;
+    console.log(content,authorId, userName, userAvatar);
     // Create the comment
     const newComment = new this.commentModel({
       content,
       postId,
       authorId,
+      userName,  // Add the userName
+      userAvatar, // Add the userAvatar
     });
     const savedComment = await newComment.save();
 
@@ -222,5 +224,32 @@ async getPostComments(postId: string): Promise<Comment[]> {
     return post.comments as unknown as Comment[];
   }
 
+
+  async getSuggestedPosts(userId: string): Promise<Post[]> {
+    // Fetch the user and the clubs they are following
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Get the list of clubs the user is following
+    const followedClubIds = user.followedClubs.map((club) => club.toString());
+
+    // Find clubs the user is not following
+    const clubsNotFollowed = await this.clubModel
+      .find({ _id: { $nin: followedClubIds } })
+      .exec();
+
+    if (!clubsNotFollowed.length) {
+      throw new Error('No clubs found that the user is not following');
+    }
+
+    // Get the posts from these clubs
+    const posts = await this.postModel
+      .find({ clubId: { $in: clubsNotFollowed.map((club) => club._id) } })
+      .exec();
+
+    return posts;
+  }
 
 }

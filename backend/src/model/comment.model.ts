@@ -13,6 +13,12 @@ export class Comment extends Document {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   authorId: string; // Reference to the user who created the comment
 
+  @Prop({ required: true })
+  userName: string; // User name of the commenter
+
+  @Prop({ required: true })
+  userAvatar: string; // Avatar URL of the commenter
+    
   @Prop({ default: Date.now })
   createdAt: Date;
 }

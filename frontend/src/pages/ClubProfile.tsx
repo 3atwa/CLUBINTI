@@ -72,7 +72,6 @@ export function ClubProfile() {
           headers: { Authorization: `Bearer ${token}` },
         });
         const userData = await response.json();
-        console.log(userData);
         if (userData.followedClubs && userData.followedClubs.includes(clubData?._id)) {
           setIsFollowing(true); // Set isFollowing if the club is in the followed clubs list
         }

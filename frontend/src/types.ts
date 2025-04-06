@@ -30,6 +30,7 @@ export interface Activity {
   image?: string;
   likes: number;
   isLiked?: boolean;
+  isFollowed?: boolean;
   comments?: Comment[];
 }
 
@@ -38,8 +39,8 @@ export interface Comment {
   userId: string;
   userName: string;
   userAvatar: string;
-  text: string;
-  date: string;
+  content: string;
+  createdAt: string;
 }
 
 export interface UserProfile {

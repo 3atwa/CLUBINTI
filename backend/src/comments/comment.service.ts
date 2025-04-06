@@ -18,6 +18,8 @@ export class CommentsService {
     content: string,
     postId: string,
     authorId: string,
+    userAvatar: string,
+    userName: string,
   ): Promise<Comment> {
     // Check if the post exists
     const post = await this.postModel.findById(postId).exec();
@@ -32,7 +34,7 @@ export class CommentsService {
     }
 
     // Create the comment
-    const newComment = new this.commentModel({ content, postId, authorId });
+    const newComment = new this.commentModel({ content, postId, authorId, userAvatar, userName });
     return newComment.save();
   }
 }

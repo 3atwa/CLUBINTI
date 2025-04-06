@@ -12,8 +12,12 @@ export class CommentsController {
     @Body('content') content: string,
     @Body('postId') postId: string,
     @Body('authorId') authorId: string,
+    @Body('userName') userName: string,
+    @Body('userAvatar') userAvatar: string,
+
+
   ): Promise<Comment> {
-    return this.commentsService.createComment(content, postId, authorId);
+    return this.commentsService.createComment(content, postId, authorId, userName, userAvatar);
   }
 
   @Get('test')

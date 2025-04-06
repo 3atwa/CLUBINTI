@@ -9,4 +9,12 @@ export class CreateCommentDto {
   @IsString()
   @IsNotEmpty()
   authorId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  userName: string;  // Added userName
+
+  @IsString()
+  @IsNotEmpty()
+  userAvatar: string; // Added userAvatar
 }
