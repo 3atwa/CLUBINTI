@@ -94,6 +94,21 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }: EditProfi
     }
   };
 
+
+  const handleLogoUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'Clubinti'); // from Cloudinary settings
+  
+    const res = await fetch('https://api.cloudinary.com/v1_1/dfsgxwuam/image/upload', {
+      method: 'POST',
+      body: formData,
+    });
+  
+    const data = await res.json();
+    setFormData(prev => ({ ...prev, logo: data.secure_url })); // store the image URL
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -123,23 +138,35 @@ export function EditProfileModal({ isOpen, onClose, profile, onSave }: EditProfi
                     alt="Profile"
                     className="w-24 h-24 rounded-full object-cover"
                   />
-                  <button
-                    type="button"
-                    className="absolute bottom-0 right-0 bg-indigo-600 p-2 rounded-full text-white hover:bg-indigo-700"
-                  >
+                  <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleLogoUpload(file);
+                }}
+                className="hidden"
+                id="logo-upload"
+              />
+              <button
+                type="button"
+                onClick={() => document.getElementById('logo-upload')?.click()} // 👈 trigger click on input
+                className="absolute bottom-0 right-0 bg-indigo-600 p-2 rounded-full text-white hover:bg-indigo-700"
+              >
                     <Camera size={16} />
                   </button>
                 </div>
                 <div className="flex-1">
-                  <input
-                    type="url"
-                    value={formData.avatar}
-                    onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
-                    placeholder="Enter image URL"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
+                <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleLogoUpload(file);
+                        }}
+                      />
                   <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Enter the URL of your profile picture
+                    Upload your logo
                   </p>
                 </div>
               </div>

@@ -28,6 +28,36 @@ export function CreateClubModal({ isOpen, onClose, onSubmit }: CreateClubModalPr
     onClose();
   };
 
+
+  const handleLogoUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'Clubinti'); // from Cloudinary settings
+  
+    const res = await fetch('https://api.cloudinary.com/v1_1/dfsgxwuam/image/upload', {
+      method: 'POST',
+      body: formData,
+    });
+  
+    const data = await res.json();
+    setFormData(prev => ({ ...prev, logo: data.secure_url })); // store the image URL
+  };
+  
+  const handleCoverUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'Clubinti'); // same preset as logo
+  
+    const res = await fetch('https://api.cloudinary.com/v1_1/dfsgxwuam/image/upload', {
+      method: 'POST',
+      body: formData,
+    });
+  
+    const data = await res.json();
+    setFormData(prev => ({ ...prev, coverImage: data.secure_url })); // store the image URL
+  };
+  
+
   if (!isOpen) return null;
 
   return (
@@ -56,21 +86,34 @@ export function CreateClubModal({ isOpen, onClose, onSubmit }: CreateClubModalPr
                     alt="Profile"
                     className="w-24 h-24 rounded-full object-cover"
                   />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleLogoUpload(file);
+                    }}
+                    className="hidden"
+                    id="logo-upload"
+                  />
                   <button
                     type="button"
+                    onClick={() => document.getElementById('logo-upload')?.click()} // 👈 trigger click on input
                     className="absolute bottom-0 right-0 bg-indigo-600 p-2 rounded-full text-white hover:bg-indigo-700"
                   >
+
                     <Camera size={16} />
                   </button>
                 </div>
                 <div className="flex-1">
-                  <input
-                    type="url"
-                    value={formData.logo}
-                    onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
-                    placeholder="Enter image URL"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
+                <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleLogoUpload(file);
+                        }}
+                      />
                   <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     Enter the URL of your profile picture
                   </p>
@@ -123,21 +166,35 @@ export function CreateClubModal({ isOpen, onClose, onSubmit }: CreateClubModalPr
                 <option value="Other">Other</option>
               </select>
             </div>
-
             <div>
-              <label htmlFor="coverImage" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Cover Image URL
-              </label>
-              <input
-                type="url"
-                id="coverImage"
-                required
-                value={formData.coverImage}
-                onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
+  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+    Cover Image
+  </label>
+  <div className="flex items-center space-x-6">
+    <div className="relative">
+      {formData.coverImage && (
+        <img
+          src={formData.coverImage}
+          alt="Cover"
+          className="w-48 h-24 object-cover rounded"
+        />
+      )}
+    </div>
+    <div className="flex-1">
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleCoverUpload(file);
+        }}
+      />
+      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        Upload a wide banner-style image
+      </p>
+    </div>
+  </div>
+</div>
           </div>
 
           <div className="mt-6 flex justify-end space-x-3">
