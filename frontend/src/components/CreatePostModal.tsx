@@ -18,6 +18,26 @@ export function CreatePostModal({ isOpen, onClose, onSubmit }: CreatePostModalPr
     image: '',
   });
 
+  
+  const handleImageUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'Clubinti'); // from Cloudinary settings
+  
+    const res = await fetch('https://api.cloudinary.com/v1_1/dfsgxwuam/image/upload', {
+      method: 'POST',
+      body: formData,
+    });
+  
+    const data = await res.json();
+    setFormData(prev => ({ ...prev, image: data.secure_url })); // store the image URL
+  };
+
+
+  
+  
+  
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
@@ -69,19 +89,30 @@ export function CreatePostModal({ isOpen, onClose, onSubmit }: CreatePostModalPr
               />
             </div>
 
-            <div>
-              <label htmlFor="image" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Image URL (optional)
-              </label>
-              <input
-                type="url"
-                id="image"
-                value={formData.image}
-                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
+            <div className="flex items-center space-x-6">
+    <div className="relative">
+      {formData.image && (
+        <img
+          src={formData.image}
+          alt="Cover"
+          className="w-48 h-24 object-cover rounded"
+        />
+      )}
+    </div>
+    <div className="flex-1">
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleImageUpload(file);
+        }}
+      />
+      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        Upload a wide banner-style image
+      </p>
+    </div>
+  </div>
           </div>
 
           <div className="mt-6 flex justify-end space-x-3">

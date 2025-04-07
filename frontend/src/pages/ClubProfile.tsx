@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Activity, Club, Comment } from '../types';
-import { Users, Heart, MessageCircle, Share2, Plus, Settings, Bell, BellOff, Trash2 } from 'lucide-react';
+import { Activity, Club } from '../types';
+import { Users, Heart, MessageCircle, Share2, Plus, Settings, Trash2 } from 'lucide-react';
 import { BackButton } from '../components/BackButton';
 import { CreatePostModal } from '../components/CreatePostModal';
 import { CommentSection } from '../components/CommentSection';
@@ -31,9 +31,12 @@ export function ClubProfile() {
   var isOwner = false;
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
+  let decoded: DecodedToken | null = null;
+
   const token = localStorage.getItem('access_token') || "";
-   const decoded = jwtDecode<DecodedToken>(token);   
-  
+  if (token !== "") {
+    decoded = jwtDecode<DecodedToken>(token);
+  } 
   useEffect(() => {
     const fetchClubData = async () => {
       try {
@@ -54,7 +57,7 @@ export function ClubProfile() {
             description: post.description || post.content || '',
             date: post.createdAt,
             image: post.image || '',
-            likes: 0, // API doesn't provide likes, assuming 0
+            likes: [], // API doesn't provide likes, assuming 0
             isLiked: false,
             comments: post.comments || [],
           }))
@@ -153,7 +156,7 @@ export function ClubProfile() {
     }
   };
 
-  if (clubData && user) {
+  if (clubData && user && decoded) {
     if (clubData.ownerId === decoded.sub) {
       isOwner = true;
     }
@@ -168,16 +171,14 @@ export function ClubProfile() {
       alert('You need to be logged in to create clubs');
       return;
     }
-  
-    const user = JSON.parse(userString);
-    if (!postData.image) {
+      if (!postData.image) {
       delete postData.image;
     }
     try {
       const response = await fetch(`http://localhost:3002/clubs/${id}/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...postData, authorId: decoded.sub }),
+        body: JSON.stringify({ ...postData, authorId: decoded?.sub }),
       });
 
       if (!response.ok) {
@@ -220,6 +221,61 @@ export function ClubProfile() {
   };
   
 
+  const handleLike = async (activityId: string) => {
+    if (!user || !decoded) return;
+      
+    // Optimistic update
+    setPosts(posts.map(activity => {
+      if (activity.id === activityId) {
+        return {
+          ...activity,
+          likes: [...activity.likes, decoded.sub], // Add user ID to likes array
+          isLiked: true, // Mark this post as liked
+        };
+      }
+      return activity;
+    }));
+  
+    // Send API call to like the post
+    try {
+      await fetch(`http://localhost:3002/posts/${activityId}/like/${decoded.sub}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+    } catch (error) {
+      console.error('Failed to like post:', error);
+      // Revert the optimistic update if the API call fails
+    }
+  };
+  const handleUnlike = async (activityId: string) => {
+    if (!user || !decoded) return;
+    // Optimistic update
+    setPosts(posts.map(activity => {
+      if (activity.id === activityId) {
+        return {
+          ...activity,
+          likes: activity.likes.filter(like => like !== decoded.sub), // Remove user ID from likes array
+          isLiked: false, // Mark this post as unliked
+        };
+      }
+      return activity;
+    }));
+  
+    // Send API call to unlike the post
+    try {
+      await fetch(`http://localhost:3002/posts/${activityId}/unlike/${decoded.sub}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+    } catch (error) {
+      console.error('Failed to unlike post:', error);
+      // Revert the optimistic update if the API call fails
+    }
+  };
 
 
   if (isLoading) {
@@ -279,7 +335,7 @@ export function ClubProfile() {
                   </button>
                 </>
               ) : (
-                user && (
+                user && decoded && (
                   <FollowButton
                     userId={decoded.sub}
                     clubId={clubData._id}
@@ -316,7 +372,9 @@ export function ClubProfile() {
 
           {posts.length > 0 ? (
             <div className="space-y-6">
-              {posts.map((post) => (
+              {posts.map((post) => {
+               const isLiked = post.likes.includes(user?._id); 
+                return(
                 <div key={post.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
                   {/* Post Header */}
                   <div className="p-4 flex items-center">
@@ -377,14 +435,23 @@ export function ClubProfile() {
                   <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <button
-                          className={`flex items-center space-x-1  hover:text-red-500 transition-colors`}
-                        >
+                      <button
+                                            onClick={() => {
+                                              if (isLiked) {
+                                                handleUnlike(post.id); // If already liked, trigger unlike
+                                              } else {
+                                                handleLike(post.id); // If not liked, trigger like
+                                              }
+                                            }}
+                                            className={`flex items-center space-x-1 ${
+                                              isLiked ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'
+                                            } hover:text-red-500 transition-colors`}
+                                          >
                           <Heart
                             size={20}
-                            className={post.isLiked ? 'fill-current' : ''}
+                            className={isLiked ? 'fill-current' : ''}
                           />
-                          <span>{post.likes}</span>
+                          <span>{post.likes.length}</span>
                         </button>
                         <button 
                           className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
@@ -415,7 +482,8 @@ export function ClubProfile() {
                     </div>
                   )}
                 </div>
-              ))}
+                );
+})}
             </div>
           ) : (
             <p className="text-center text-gray-600 dark:text-gray-300">No posts yet.</p>

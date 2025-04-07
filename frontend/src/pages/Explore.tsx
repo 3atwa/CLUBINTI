@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { Club } from '../types';
 import { Search, Plus, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -23,17 +23,20 @@ export function Explore() {
 
   const categories = ['All', 'Arts', 'Academic', 'Technology', 'Social', 'Sports', 'Other'];
 
+  let decoded: DecodedToken | null = null;
+
   const token = localStorage.getItem('access_token') || "";
-  const decoded = jwtDecode<DecodedToken>(token); 
+  if (token !== "") {
+    decoded = jwtDecode<DecodedToken>(token);
+  } 
   const handleCreateClub = async (clubData: any) => {
     const userString = localStorage.getItem('user');
   
-    if (!userString) {
+    if (!userString || !decoded) {
       alert('You need to be logged in to create clubs');
       return;
     }
   
-    const user = JSON.parse(userString); // ✅ Parse the user from localStorage
   
     const clubDataWithOwner = {
       ...clubData,

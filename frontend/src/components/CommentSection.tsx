@@ -19,8 +19,12 @@ export function CommentSection({ postId, comments: initialComments , onAddCommen
   const [error, setError] = useState<string | null>(null);
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
-    const token = localStorage.getItem('access_token') || "";
-    const decoded = jwtDecode<DecodedToken>(token); 
+      let decoded: DecodedToken | null = null;
+    
+      const token = localStorage.getItem('access_token') || "";
+      if (token !== "") {
+        decoded = jwtDecode<DecodedToken>(token);
+      } 
   const navigate = useNavigate(); // Initialize the navigate function
 
   // Fetch comments from API when component mounts or postId changes
@@ -71,7 +75,7 @@ export function CommentSection({ postId, comments: initialComments , onAddCommen
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user) {
+    if (!user || !decoded) {
       navigate('/login'); // Redirect to login if the user is not logged in
       return; // Exit early to prevent further code execution
     }

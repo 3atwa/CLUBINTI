@@ -127,7 +127,23 @@ export class UserController {
   
     return await this.userService.followClub(userId, clubId);
   }
+  @Patch(':id/unfollow/:clubId')
+  @ApiOperation({ summary: 'Unfollow a club' })
+  @ApiBearerAuth('access-token')
+  async unfollowClub(
+    @Param('id') userId: string,
+    @Param('clubId') clubId: string,
+    @Req() req: any,
+  ): Promise<User> {
+    const tokenUserId = req.user._id.toString(); // The user in the token
 
+    // Check if user is trying to follow for their own account
+    if (tokenUserId !== userId) {
+      throw new ForbiddenException('You cannot perform this action for another user');
+    }
+  
+    return await this.userService.unfollowClub(userId, clubId);
+  }
 }
 
 
