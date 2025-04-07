@@ -192,6 +192,36 @@ export function ClubProfile() {
     }
   };
 
+
+  const handleDeletePost = async (postId: string) => {
+    const confirmed = window.confirm('Are you sure you want to delete this post?');
+    if (!confirmed) return;
+  
+    try {
+      const token = localStorage.getItem('access_token') || '';
+      const response = await fetch(`http://localhost:3002/posts/${postId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to delete post');
+      }
+  
+      // Remove post from state
+      setPosts((prev) => prev.filter((p) => p.id !== postId));
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      alert('Could not delete post. Please try again.');
+    }
+  };
+  
+
+
+
   if (isLoading) {
     return <div className="text-center text-gray-600 dark:text-gray-300">Loading...</div>;
   }
@@ -317,6 +347,17 @@ export function ClubProfile() {
                       <Users size={16} className="mr-1" />
                       <span>View Club</span>
                     </Link>
+                    {isOwner && (
+                    <div className="flex justify-end px-4 pb-3">
+                      <button
+                        onClick={() => handleDeletePost(post.id)}
+                        className="flex items-center text-sm text-red-600 dark:text-red-400 hover:underline"
+                      >
+                        <Trash2 size={16} className="mr-1" />
+                        Delete Post
+                      </button>
+                    </div>
+                  )}
                   </div>
                   
                   {/* Post Content */}
