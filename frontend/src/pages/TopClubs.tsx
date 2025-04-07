@@ -5,60 +5,61 @@ import { Award, TrendingUp, ThumbsUp, Users, Star, Trophy, Medal, Bell } from 'l
 // Mock data for club rankings
 const clubRankings = [
   {
-    id: '1',
-    name: 'Photography Club',
-    avatar: 'https://images.unsplash.com/photo-1554080353-a576cf803bda?auto=format&fit=crop&q=80',
+    id: '67efaf29e1af25822d738db9',
+    name: 'CLL',
+    avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEzUbN9QQve8lGE6HfLfal9Z0ulYJd0lsiJQ&s',
     totalPosts: 156,
     totalLikes: 3240,
-    memberCount: 324,
+    memberCount: 156,
     engagement: 92,
     trending: true,
-    description: 'A community of photography enthusiasts sharing their passion for capturing moments.'
+    description: 'An open-source community dedicated to collaboration, innovation, and the development of accessible software solutions for everyone.'
   },
   {
-    id: '2',
-    name: 'Debate Society',
-    avatar: 'https://images.unsplash.com/photo-1505664194779-8beaceb93744?auto=format&fit=crop&q=80',
+    id: '67cc22759135147bb43c238c',
+    name: 'Tunivision',
+    avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXTKVNt-OCoYY4z_xypW7ZkpW_ZK6QzZFqIQ&s',
     totalPosts: 89,
     totalLikes: 1678,
-    memberCount: 156,
-    engagement: 85,
+    memberCount: 143,
+    engagement: 88,
     trending: true,
-    description: 'Fostering critical thinking through meaningful discussions and debates.'
+    description: 'A youth-led organization committed to service, professional development, and community outreach, inspired by the values of Retaract.'
   },
   {
-    id: '3',
-    name: 'Tech Innovators',
-    avatar: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80',
+    id: '67f16286da724da5e35dc041',
+    name: 'Forma Club',
+    avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYrOzKU4BK-eB_-WfTNuREmTVNkJK234UAYg&s',
     totalPosts: 78,
     totalLikes: 890,
-    memberCount: 145,
-    engagement: 76,
+    memberCount: 128,
+    engagement: 85,
     trending: false,
     description: 'Building the future through technology and innovation.'
   },
   {
     id: '4',
-    name: 'Art Collective',
-    avatar: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&q=80',
+    name: 'Astro',
+    avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTN1qsBIF25FpWw27unDfK3Kwa7Yej0x_kKkg&s',
     totalPosts: 112,
     totalLikes: 1456,
-    memberCount: 178,
-    engagement: 72,
+    memberCount: 112,
+    engagement: 82,
     trending: false,
     description: 'Exploring creativity through various art forms and collaborative projects.'
   },
   {
     id: '5',
-    name: 'Environmental Action',
-    avatar: 'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&q=80',
+    name: 'Cinéclub',
+    avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSktZfoqUTqg2vxd-ZqN4-6mQuHxK_FtYbN8Q&s',
     totalPosts: 67,
     totalLikes: 1230,
-    memberCount: 134,
-    engagement: 68,
+    memberCount: 98,
+    engagement: 79,
     trending: true,
     description: 'Working together to create a more sustainable future for our planet.'
   }
+  
 ];
 
 export function TopClubs() {

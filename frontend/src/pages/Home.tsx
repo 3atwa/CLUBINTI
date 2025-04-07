@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Activity } from '../types';
 import { Heart, MessageCircle, Share2, Users, Award, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { CommentSection } from '../components/CommentSection';
 import Ranking from '../components/Ranking';
 
@@ -106,7 +106,7 @@ export function Home() {
   }, [followedClubs]);
 
   const handleLike = async (activityId: string) => {
-    if(user){
+    if (!user) return;
       
     // Optimistic update
     setActivities(activities.map(activity => {
@@ -119,7 +119,7 @@ export function Home() {
       }
       return activity;
     }));
-  }
+  
     // Send API call to like the post
     try {
       await fetch(`http://localhost:3002/posts/${activityId}/like/${user._id}`, {
@@ -134,6 +134,7 @@ export function Home() {
     }
   };
   const handleUnlike = async (activityId: string) => {
+    if (!user) return;
     // Optimistic update
     setActivities(activities.map(activity => {
       if (activity.id === activityId) {
@@ -169,7 +170,9 @@ export function Home() {
   };
 
   const handleAddComment = async ( commentText: string) => {
-    if (!user) return;
+    if(!user) {
+      <Navigate to={'/login'}/>
+    };
     
     const newComment = {
       id: Date.now().toString(),
@@ -239,7 +242,7 @@ export function Home() {
                   {activities.map((activity, index) => {
                     // Insert the Suggestions header before the first non-followed club post
                     const showSuggestionsHeader = index === firstSuggestionIndex && index > 0 && !activity.isFollowed;
-                    const isLiked = activity.likes.includes(user._id); 
+                    const isLiked = activity.likes.includes(user?._id); 
                     return (
                       <div key={activity.id}>
                         {showSuggestionsHeader && (

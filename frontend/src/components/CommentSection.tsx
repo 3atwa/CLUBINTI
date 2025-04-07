@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Comment } from '../types';
+import { useNavigate } from 'react-router-dom';
 
 interface CommentSectionProps {
   postId: string;
@@ -14,6 +15,7 @@ export function CommentSection({ postId, comments: initialComments, onAddComment
   const [error, setError] = useState<string | null>(null);
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
+  const navigate = useNavigate(); // Initialize the navigate function
 
   // Fetch comments from API when component mounts or postId changes
   useEffect(() => {
@@ -61,14 +63,19 @@ export function CommentSection({ postId, comments: initialComments, onAddComment
 
 
   const handleSubmit = async (e: React.FormEvent) => {
-
     e.preventDefault();
-  
+
+    if (!user) {
+      navigate('/login'); // Redirect to login if the user is not logged in
+      return; // Exit early to prevent further code execution
+    }
+
+
     if (newComment.trim()) {
       // Prepare the data to send
       const commentData = {
         content: newComment,
-        authorId: user._id || "0",  // Replace with actual current user ID
+        authorId: user?._id ,  // Replace with actual current user ID
         userName: user.name || "guest",  // Replace with actual user name
         userAvatar: user.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80",  // Replace with actual user avatar URL
       };
@@ -153,7 +160,7 @@ export function CommentSection({ postId, comments: initialComments, onAddComment
       
       <form onSubmit={handleSubmit} className="flex items-start space-x-3">
         <img 
-          src={user.avatar}
+          src={user?.avatar || "https://secure.gravatar.com/avatar/15f8001624bd5b624aa2c00d0d25b1f4?s=168&d=mm&r=g"}
           alt="Your avatar" 
           className="w-10 h-10 rounded-full object-cover"
         />
