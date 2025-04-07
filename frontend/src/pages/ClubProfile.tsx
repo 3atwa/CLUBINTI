@@ -1,26 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Activity, Club, Comment } from '../types';
-import { Users, Heart, MessageCircle, Share2, Plus, Settings, Bell, BellOff } from 'lucide-react';
+import { Users, Heart, MessageCircle, Share2, Plus, Settings, Bell, BellOff, Trash2 } from 'lucide-react';
 import { BackButton } from '../components/BackButton';
 import { CreatePostModal } from '../components/CreatePostModal';
 import { CommentSection } from '../components/CommentSection';
 import { Link } from 'react-router-dom';
 import { FollowButton } from '../components/FollowButton';
+import { EditClubModal } from '../components/EditClub';
+import { DeleteConfirmationModal } from '../components/DeleteConfirmationModal';
 
 export function ClubProfile() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [clubData, setClubData] = useState<Club | null>(null);
   const [posts, setPosts] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [expandedComments, setExpandedComments] = useState<string[]>([]);
-
+  const [isEditClubModalOpen, setIsEditClubModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   var isOwner = false;
-   const userString = localStorage.getItem('user');
-   const user = userString? JSON.parse(userString) : null;
+  const userString = localStorage.getItem('user');
+  const user = userString ? JSON.parse(userString) : null;
+  const token = localStorage.getItem('access_token');
 
   useEffect(() => {
     const fetchClubData = async () => {
@@ -52,18 +58,12 @@ export function ClubProfile() {
       } finally {
         setIsLoading(false);
       }
-
     };
-
 
     if (id) {
       fetchClubData();
     }
   }, [id]);
-
-
-  const token = localStorage.getItem('access_token');
-
 
   useEffect(() => { 
     // Fetch the user's followed clubs from the backend to check if the user is following this club
@@ -81,12 +81,49 @@ export function ClubProfile() {
       }
     };
 
-    checkFollowingStatus();
-  }, [user._id, clubData?._id, token]);
+    if (user && clubData) {
+      checkFollowingStatus();
+    }
+  }, [user?._id, clubData?._id, token]);
 
+  const handleClubUpdate = (updatedClub: Partial<Club>) => {
+    setClubData((clubData) => {
+      // Check if prevClubData is not null before merging
+      if (clubData) {
+        return { ...clubData, ...updatedClub };
+      }
+      return clubData; // Return null if prevClubData is null
+    });
+  };
 
+  const handleDeleteClub = async () => {
+    if (!id || !token) return;
+    
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`http://localhost:3002/clubs/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
 
+      if (!response.ok) {
+        throw new Error('Failed to delete club');
+      }
 
+      // Success! Navigate back to a safe place
+      navigate('/explore'); // Assuming you have a clubs listing page
+      
+    } catch (error) {
+      console.error('Error deleting club:', error);
+      alert('Failed to delete club. Please try again.');
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
+    }
+  };
 
   const toggleComments = (activityId: string) => {
     if (expandedComments.includes(activityId)) {
@@ -96,15 +133,13 @@ export function ClubProfile() {
     }
   };
 
-  if(clubData && user){
-    if(clubData.ownerId === user._id){
+  if (clubData && user) {
+    if (clubData.ownerId === user._id) {
       isOwner = true;
     }
+  } else {
+    isOwner = false;
   }
-  else{
-     isOwner = false;
-  }
-
 
   const handleCreatePost = async (postData: any) => {
     const userString = localStorage.getItem('user');
@@ -114,7 +149,7 @@ export function ClubProfile() {
       return;
     }
   
-    const user = JSON.parse(userString); // ✅ Parse the user from localStorage
+    const user = JSON.parse(userString);
     if (!postData.image) {
       delete postData.image;
     }
@@ -136,9 +171,6 @@ export function ClubProfile() {
       console.error('Error creating post:', error);
     }
   };
-
-
-
 
   if (isLoading) {
     return <div className="text-center text-gray-600 dark:text-gray-300">Loading...</div>;
@@ -179,23 +211,35 @@ export function ClubProfile() {
               </div>
             </div>
             <div className="mt-4 sm:mt-0 flex items-center gap-3">
-                {isOwner ? (
-                  <button className="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+              {isOwner ? (
+                <>
+                  <button 
+                    onClick={() => setIsEditClubModalOpen(true)}
+                    className="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  >
                     <Settings size={20} className="mr-2" />
                     Manage Club
                   </button>
-                ) : (
-                  user && (
-                    <FollowButton
-                      userId={user._id}
-                      clubId={clubData._id}
-                      token={localStorage.getItem('access_token') || ''}
-                      isFollowing={isFollowing}
-                      onToggle={setIsFollowing}
-                    />
-                  )
-                )}
-              </div>
+                  <button 
+                    onClick={() => setIsDeleteModalOpen(true)}
+                    className="inline-flex items-center px-4 py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-full font-semibold hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                  >
+                    <Trash2 size={20} className="mr-2" />
+                    Delete Club
+                  </button>
+                </>
+              ) : (
+                user && (
+                  <FollowButton
+                    userId={user._id}
+                    clubId={clubData._id}
+                    token={localStorage.getItem('access_token') || ''}
+                    isFollowing={isFollowing}
+                    onToggle={setIsFollowing}
+                  />
+                )
+              )}
+            </div>
           </div>
 
           {/* Club Description */}
@@ -225,90 +269,90 @@ export function ClubProfile() {
               {posts.map((post) => (
                 <div key={post.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
                   {/* Post Header */}
-                                      <div className="p-4 flex items-center">
-                                        <Link to={`/club/${post.clubId}`} className="flex items-center flex-1">
-                                          <img
-                                            src={clubData.coverImage}
-                                            alt={clubData.name}
-                                            className="w-12 h-12 rounded-full object-cover"
-                                          />
-                                          <div className="ml-3">
-                                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400">
-                                              {post.clubName}
-                                            </h3>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                              {new Date(post.date).toLocaleDateString('en-US', {
-                                                month: 'long',
-                                                day: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                              })}
-                                            </p>
-                                          </div>
-                                        </Link>
-                                        <Link
-                                          to={`/club/${post.clubId}`}
-                                          className="flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
-                                        >
-                                          <Users size={16} className="mr-1" />
-                                          <span>View Club</span>
-                                        </Link>
-                                      </div>
-                  
-                                      {/* Post Content */}
-                                      <div className="px-4 pb-3">
-                                        <p className="text-gray-800 dark:text-gray-200 whitespace-pre-line">{post.description}</p>
-                                      </div>
-                  
-                                      {post.image && (
-                                        <img
-                                          src={post.image}
-                                          alt={post.title}
-                                          className="w-full aspect-video object-cover"
-                                        />
-                                      )}
-                  
-                                      {/* Post Actions */}
-                                      <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
-                                        <div className="flex items-center justify-between">
-                                          <div className="flex items-center space-x-4">
-                                            <button
-                                              className={`flex items-center space-x-1  hover:text-red-500 transition-colors`}
-                                            >
-                                              <Heart
-                                                size={20}
-                                                className={post.isLiked ? 'fill-current' : ''}
-                                              />
-                                              <span>{post.likes}</span>
-                                            </button>
-                                            <button 
-                                              className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
-                                              onClick={() => toggleComments(post.id)}
-                                              >
-                                              <MessageCircle size={20} />
-                                              <span>
-                                                {post.comments && post.comments.length > 0 
-                                                  ? `Comments (${post.comments.length})` 
-                                                  : 'Comment'}
-                                              </span>
-                                            </button>
-                                            <button className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
-                                              <Share2 size={20} />
-                                              <span>Share</span>
-                                            </button>
-                                          </div>
-                                        </div>
-                                      </div>
-                    {/* Comment Section */}
-                    {expandedComments.includes(post.id) && (
-                      <div className="px-4 pb-4">
-                        <CommentSection 
-                          postId={post.id}
-                          comments={post.comments || []}
-                          onAddComment={handleCreatePost}
-                        />
+                  <div className="p-4 flex items-center">
+                    <Link to={`/club/${post.clubId}`} className="flex items-center flex-1">
+                      <img
+                        src={clubData.coverImage}
+                        alt={clubData.name}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                      <div className="ml-3">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400">
+                          {post.clubName}
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {new Date(post.date).toLocaleDateString('en-US', {
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
                       </div>
-                    )}
+                    </Link>
+                    <Link
+                      to={`/club/${post.clubId}`}
+                      className="flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                    >
+                      <Users size={16} className="mr-1" />
+                      <span>View Club</span>
+                    </Link>
+                  </div>
+                  
+                  {/* Post Content */}
+                  <div className="px-4 pb-3">
+                    <p className="text-gray-800 dark:text-gray-200 whitespace-pre-line">{post.description}</p>
+                  </div>
+                  
+                  {post.image && (
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="w-full aspect-video object-cover"
+                    />
+                  )}
+                  
+                  {/* Post Actions */}
+                  <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <button
+                          className={`flex items-center space-x-1  hover:text-red-500 transition-colors`}
+                        >
+                          <Heart
+                            size={20}
+                            className={post.isLiked ? 'fill-current' : ''}
+                          />
+                          <span>{post.likes}</span>
+                        </button>
+                        <button 
+                          className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
+                          onClick={() => toggleComments(post.id)}
+                        >
+                          <MessageCircle size={20} />
+                          <span>
+                            {post.comments && post.comments.length > 0 
+                              ? `Comments (${post.comments.length})` 
+                              : 'Comment'}
+                          </span>
+                        </button>
+                        <button className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
+                          <Share2 size={20} />
+                          <span>Share</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Comment Section */}
+                  {expandedComments.includes(post.id) && (
+                    <div className="px-4 pb-4">
+                      <CommentSection 
+                        postId={post.id}
+                        comments={post.comments || []}
+                        onAddComment={handleCreatePost}
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -321,6 +365,21 @@ export function ClubProfile() {
         isOpen={isCreatePostModalOpen}
         onClose={() => setIsCreatePostModalOpen(false)}
         onSubmit={handleCreatePost}
+      />
+      <EditClubModal
+        isOpen={isEditClubModalOpen}
+        onClose={() => setIsEditClubModalOpen(false)}
+        club={clubData}
+        onSave={handleClubUpdate}
+      />
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteClub}
+        title="Delete Club"
+        message="Are you sure you want to delete this club? This action cannot be undone and all club posts will be permanently deleted."
+        confirmLabel="Delete Club"
+        isLoading={isDeleting}
       />
     </div>
   );

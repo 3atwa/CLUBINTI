@@ -112,7 +112,7 @@ export class ClubService {
 
   // Update club details
   async updateClub(clubId: string, updateClubDto: UpdateClubDto): Promise<Club> {
-    const club = await this.clubModel.findOne({ id: clubId }).exec();
+    const club = await this.clubModel.findOne({ _id: clubId }).exec();
     if (!club) {
       throw new Error('Club not found');
     }
