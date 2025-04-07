@@ -36,7 +36,8 @@ export function ClubProfile() {
             id: post._id,
             clubId: post.clubId,
             clubName: club.name,
-            clubAvatar: club.coverImage,
+            clubCover: club.coverImage,
+            clubAvatar: club.logo,
             title: post.title || 'Untitled Post',
             description: post.description || post.content || '',
             date: post.createdAt,
@@ -168,7 +169,7 @@ export function ClubProfile() {
           <div className="sm:flex sm:items-center sm:justify-between">
             <div className="flex items-center">
               <img
-                src={clubData.coverImage}
+                src={clubData.logo}
                 alt={clubData.name}
                 className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-700 shadow-lg"
               />
