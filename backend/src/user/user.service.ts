@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types  } from 'mongoose';
 import { UpdateUserDto, UserUpdateDto} from './dto';
 import { User } from 'src/model/user.model';
+import { Post } from 'src/model/post.model';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
@@ -96,5 +98,6 @@ export class UserService {
     if (!user) throw new Error('User not found');
     return user;
   }
+
   
 }

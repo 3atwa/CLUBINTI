@@ -68,9 +68,9 @@ export function CommentSection({ postId, comments: initialComments, onAddComment
       // Prepare the data to send
       const commentData = {
         content: newComment,
-        authorId: user._id,  // Replace with actual current user ID
-        userName: user.name,  // Replace with actual user name
-        userAvatar: user.avatar,  // Replace with actual user avatar URL
+        authorId: user._id || "0",  // Replace with actual current user ID
+        userName: user.name || "guest",  // Replace with actual user name
+        userAvatar: user.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80",  // Replace with actual user avatar URL
       };
       console.log(commentData);
       

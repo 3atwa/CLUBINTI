@@ -28,7 +28,7 @@ export interface Activity {
   description: string;
   date: string;
   image?: string;
-  likes: number;
+  likes: string[];
   isLiked?: boolean;
   isFollowed?: boolean;
   comments?: Comment[];

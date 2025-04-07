@@ -10,7 +10,6 @@ export function Home() {
   const [expandedComments, setExpandedComments] = useState<string[]>([]);
   const [followedClubs, setFollowedClubs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
   const token = localStorage.getItem('access_token');
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
@@ -78,7 +77,7 @@ export function Home() {
             description: post.description || post.content || '',
             date: post.createdAt,
             image: post.image || '',
-            likes: post.likes || 0,
+            likes: post.likes || [],
             isLiked: false,
             comments: post.comments || [],
             isFollowed: followedClubs.includes(club._id)
@@ -107,28 +106,58 @@ export function Home() {
   }, [followedClubs]);
 
   const handleLike = async (activityId: string) => {
+    if(user){
+      
     // Optimistic update
     setActivities(activities.map(activity => {
       if (activity.id === activityId) {
         return {
           ...activity,
-          likes: activity.isLiked ? activity.likes - 1 : activity.likes + 1,
-          isLiked: !activity.isLiked
+          likes: [...activity.likes, user._id], // Add user ID to likes array
+          isLiked: true, // Mark this post as liked
         };
       }
       return activity;
     }));
-    
-    // Here you could add the API call to persist the like
-    // try {
-    //   await fetch(`http://localhost:3002/posts/${activityId}/like`, {
-    //     method: 'POST',
-    //     headers: { Authorization: `Bearer ${token}` }
-    //   });
-    // } catch (error) {
-    //   console.error('Failed to like post:', error);
-    //   // Revert the optimistic update if the API call fails
-    // }
+  }
+    // Send API call to like the post
+    try {
+      await fetch(`http://localhost:3002/posts/${activityId}/like/${user._id}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+    } catch (error) {
+      console.error('Failed to like post:', error);
+      // Revert the optimistic update if the API call fails
+    }
+  };
+  const handleUnlike = async (activityId: string) => {
+    // Optimistic update
+    setActivities(activities.map(activity => {
+      if (activity.id === activityId) {
+        return {
+          ...activity,
+          likes: activity.likes.filter(like => like !== user._id), // Remove user ID from likes array
+          isLiked: false, // Mark this post as unliked
+        };
+      }
+      return activity;
+    }));
+  
+    // Send API call to unlike the post
+    try {
+      await fetch(`http://localhost:3002/posts/${activityId}/unlike/${user._id}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+    } catch (error) {
+      console.error('Failed to unlike post:', error);
+      // Revert the optimistic update if the API call fails
+    }
   };
 
   const toggleComments = (activityId: string) => {
@@ -210,7 +239,7 @@ export function Home() {
                   {activities.map((activity, index) => {
                     // Insert the Suggestions header before the first non-followed club post
                     const showSuggestionsHeader = index === firstSuggestionIndex && index > 0 && !activity.isFollowed;
-                    
+                    const isLiked = activity.likes.includes(user._id); 
                     return (
                       <div key={activity.id}>
                         {showSuggestionsHeader && (
@@ -278,18 +307,24 @@ export function Home() {
                           <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-4">
-                                <button
-                                  onClick={() => handleLike(activity.id)}
-                                  className={`flex items-center space-x-1 ${
-                                    activity.isLiked ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'
-                                  } hover:text-red-500 transition-colors`}
-                                >
-                                  <Heart
-                                    size={20}
-                                    className={activity.isLiked ? 'fill-current' : ''}
-                                  />
-                                  <span>{activity.likes}</span>
-                                </button>
+                                          <button
+                                            onClick={() => {
+                                              if (isLiked) {
+                                                handleUnlike(activity.id); // If already liked, trigger unlike
+                                              } else {
+                                                handleLike(activity.id); // If not liked, trigger like
+                                              }
+                                            }}
+                                            className={`flex items-center space-x-1 ${
+                                              isLiked ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'
+                                            } hover:text-red-500 transition-colors`}
+                                          >
+                                            <Heart
+                                              size={20}
+                                              className={isLiked ? 'fill-current' : ''}
+                                            />
+                                            <span>{activity.likes.length}</span>
+                                          </button>
                                 <button 
                                   onClick={() => toggleComments(activity.id)}
                                   className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
