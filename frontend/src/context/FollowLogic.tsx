@@ -8,7 +8,6 @@ export const useClubFollow = () => {
   const [loading, setLoading] = useState(false);
 
   const followClub = async (userId: string, clubId: string, token: string) => {
-    console.log(userId, clubId, token);
     setLoading(true);
     try {
       const res = await axios.patch(

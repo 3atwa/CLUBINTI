@@ -4,23 +4,27 @@ import { Heart, MessageCircle, Share2, Users, Award, Sparkles } from 'lucide-rea
 import { Link, Navigate } from 'react-router-dom';
 import { CommentSection } from '../components/CommentSection';
 import Ranking from '../components/Ranking';
-
+import { jwtDecode } from 'jwt-decode';
+interface DecodedToken {
+  sub: string;
+  // Add other fields if needed like email, exp, etc.
+}
 export function Home() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [expandedComments, setExpandedComments] = useState<string[]>([]);
   const [followedClubs, setFollowedClubs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem('access_token') || "";
+  const decoded = jwtDecode<DecodedToken>(token); 
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
 
   // Fetch user data and followed clubs
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!user?._id || !token) return;
-      
+      if (!token) return;
       try {
-        const response = await fetch(`http://localhost:3002/user/user/${user._id}`, {
+        const response = await fetch(`http://localhost:3002/user/user/${decoded.sub}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         
@@ -113,7 +117,7 @@ export function Home() {
       if (activity.id === activityId) {
         return {
           ...activity,
-          likes: [...activity.likes, user._id], // Add user ID to likes array
+          likes: [...activity.likes, decoded.sub], // Add user ID to likes array
           isLiked: true, // Mark this post as liked
         };
       }
@@ -122,7 +126,7 @@ export function Home() {
   
     // Send API call to like the post
     try {
-      await fetch(`http://localhost:3002/posts/${activityId}/like/${user._id}`, {
+      await fetch(`http://localhost:3002/posts/${activityId}/like/${decoded.sub}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -140,7 +144,7 @@ export function Home() {
       if (activity.id === activityId) {
         return {
           ...activity,
-          likes: activity.likes.filter(like => like !== user._id), // Remove user ID from likes array
+          likes: activity.likes.filter(like => like !== decoded.sub), // Remove user ID from likes array
           isLiked: false, // Mark this post as unliked
         };
       }
@@ -149,7 +153,7 @@ export function Home() {
   
     // Send API call to unlike the post
     try {
-      await fetch(`http://localhost:3002/posts/${activityId}/unlike/${user._id}`, {
+      await fetch(`http://localhost:3002/posts/${activityId}/unlike/${decoded.sub}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -176,7 +180,7 @@ export function Home() {
     
     const newComment = {
       id: Date.now().toString(),
-      userId: user._id,
+      userId: decoded.sub,
       userName: user.name || 'Anonymous User',
       userAvatar: user.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80',
       text: commentText,

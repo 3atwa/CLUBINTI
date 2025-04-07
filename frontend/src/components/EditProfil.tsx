@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Upload, Camera } from 'lucide-react';
+import { X, Camera } from 'lucide-react';
 import { UserProfile } from '../types';
 
 interface EditProfileModalProps {

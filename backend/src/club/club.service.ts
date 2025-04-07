@@ -252,4 +252,38 @@ async getPostComments(postId: string): Promise<Comment[]> {
     return posts;
   }
 
+
+  async cleanUpUserClubs(): Promise<void> {
+    const allClubDocs = await this.clubModel.find({}, '_id').lean();
+    const validClubIds = new Set(allClubDocs.map(club => club._id.toString()));
+
+    const users = await this.userModel.find().exec();
+
+    for (const user of users) {
+      const cleanedJoinedClubs = user.joinedClubs.filter(club => validClubIds.has(club.id));
+      const cleanedOwnedClubs = user.ownedClubs.filter(club => validClubIds.has(club.id));
+      const cleanedModeratedClubs = user.moderatedClubs.filter(club => validClubIds.has(club.id));
+      const cleanedFollowedClubs = (user.followedClubs || []).filter(clubId => validClubIds.has(clubId));
+
+      const needsUpdate =
+        cleanedJoinedClubs.length !== user.joinedClubs.length ||
+        cleanedOwnedClubs.length !== user.ownedClubs.length ||
+        cleanedModeratedClubs.length !== user.moderatedClubs.length ||
+        cleanedFollowedClubs.length !== (user.followedClubs || []).length;
+      if (needsUpdate) {
+        await this.userModel.updateOne(
+          { _id: user._id },
+          {
+            joinedClubs: cleanedJoinedClubs,
+            ownedClubs: cleanedOwnedClubs,
+            moderatedClubs: cleanedModeratedClubs,
+            followedClubs: cleanedFollowedClubs,
+          }
+        );
+      }
+    }
+
+    console.log('User club data cleanup completed!');
+  }
+
 }

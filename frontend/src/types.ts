@@ -35,7 +35,7 @@ export interface Activity {
 }
 
 export interface Comment {
-  id: string;
+  _id: string;
   userId: string;
   userName: string;
   userAvatar: string;

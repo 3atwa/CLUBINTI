@@ -104,16 +104,13 @@ export function Profile() {
   const [showPendingMembers, setShowPendingMembers] = useState(false);
   const [activeTab, setActiveTab] = useState<'managed' | 'joined'>('managed');
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
-
   const handleProfileUpdate = (updatedProfile: Partial<UserProfile>) => {
     setProfile({ ...profile, ...updatedProfile });
   };
-  
   useEffect(() => {
     if (isAuthenticated) {
-        const user = localStorage.getItem('user');
         if(user){
-        setProfile(JSON.parse(user));
+        setProfile(user);
         }
     } else {
       setProfile(mockProfile);

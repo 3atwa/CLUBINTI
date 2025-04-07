@@ -23,4 +23,14 @@ export class PostsService {
     post.likes = post.likes.filter(id => id.toString() !== userId);
     return await post.save();
   }
+
+
+    // Delete a post by postId
+    async deletePost(postId: string): Promise<void> {
+      const post = await this.postModel.findById(postId);
+      if (!post) throw new NotFoundException('Post not found');
+  
+      // Remove the post from the database
+      await this.postModel.deleteOne({ _id: postId }).exec();
+    }
 }

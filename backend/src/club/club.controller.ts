@@ -107,4 +107,10 @@ export class ClubController {
     const userId = req.user.id; // Get the logged-in user's ID from the request
     return await this.clubService.getSuggestedPosts(userId);
   }
+
+  @Get('Id/cleanup/clean/id')
+  async cleanUpUserClubs(): Promise<{ message: string }> {
+    await this.clubService.cleanUpUserClubs();
+    return { message: 'User club data cleanup completed successfully.' };
+  }
 }

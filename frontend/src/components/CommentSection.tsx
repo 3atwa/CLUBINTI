@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Comment } from '../types';
 import { useNavigate } from 'react-router-dom';
-
+import { jwtDecode } from 'jwt-decode';
+interface DecodedToken {
+  sub: string;
+  // Add other fields if needed like email, exp, etc.
+}
 interface CommentSectionProps {
   postId: string;
   comments?: Comment[]; // Make this optional since we'll fetch comments from API
   onAddComment: (postId: string, comment: string) => void;
 }
 
-export function CommentSection({ postId, comments: initialComments, onAddComment }: CommentSectionProps) {
+export function CommentSection({ postId, comments: initialComments , onAddComment }: CommentSectionProps) {
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
+    const token = localStorage.getItem('access_token') || "";
+    const decoded = jwtDecode<DecodedToken>(token); 
   const navigate = useNavigate(); // Initialize the navigate function
 
   // Fetch comments from API when component mounts or postId changes
@@ -75,7 +81,7 @@ export function CommentSection({ postId, comments: initialComments, onAddComment
       // Prepare the data to send
       const commentData = {
         content: newComment,
-        authorId: user?._id ,  // Replace with actual current user ID
+        authorId: decoded.sub ,  // Replace with actual current user ID
         userName: user.name || "guest",  // Replace with actual user name
         userAvatar: user.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80",  // Replace with actual user avatar URL
       };
@@ -128,7 +134,7 @@ export function CommentSection({ postId, comments: initialComments, onAddComment
       ) : comments && comments.length > 0 ? (
         <div className="space-y-4 mb-6">
           {comments.map((comment) => (
-            <div key={comment.id} className="flex space-x-3">
+            <div key={comment._id} className="flex space-x-3">
               <img 
                 src={comment.userAvatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80"} 
                 alt={comment.userName} 

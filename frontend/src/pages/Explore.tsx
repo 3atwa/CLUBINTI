@@ -4,6 +4,12 @@ import { Search, Plus, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CreateClubModal } from '../components/CreateClubModal';
 import { useAuth } from '../context/AuthContext';
+import { jwtDecode } from 'jwt-decode';
+interface DecodedToken {
+  sub: string;
+  // Add other fields if needed like email, exp, etc.
+}
+
 
 export function Explore() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,6 +23,8 @@ export function Explore() {
 
   const categories = ['All', 'Arts', 'Academic', 'Technology', 'Social', 'Sports', 'Other'];
 
+  const token = localStorage.getItem('access_token') || "";
+  const decoded = jwtDecode<DecodedToken>(token); 
   const handleCreateClub = async (clubData: any) => {
     const userString = localStorage.getItem('user');
   
@@ -29,7 +37,7 @@ export function Explore() {
   
     const clubDataWithOwner = {
       ...clubData,
-      ownerId: user._id, // ✅ Extract ownerId after parsing
+      ownerId: decoded.sub, // ✅ Extract ownerId after parsing
     };
   
     try {

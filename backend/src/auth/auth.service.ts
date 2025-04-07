@@ -64,7 +64,8 @@ export class AuthService {
         user.email,
         user.role,
       );
-      const { password, ...userWithoutSensitiveData } = user.toObject();
+      const { password, role, _id,...userWithoutSensitiveData } = user.toObject();
+      console.log(userWithoutSensitiveData);
       return { message, access_token, user: userWithoutSensitiveData };
     } else {
       throw new HttpException('Incorrect password', HttpStatus.UNAUTHORIZED);

@@ -9,7 +9,12 @@ import { Link } from 'react-router-dom';
 import { FollowButton } from '../components/FollowButton';
 import { EditClubModal } from '../components/EditClub';
 import { DeleteConfirmationModal } from '../components/DeleteConfirmationModal';
+import { jwtDecode } from 'jwt-decode';
 
+interface DecodedToken {
+  sub: string;
+  // Add other fields if needed like email, exp, etc.
+}
 export function ClubProfile() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -26,8 +31,9 @@ export function ClubProfile() {
   var isOwner = false;
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
-  const token = localStorage.getItem('access_token');
-
+  const token = localStorage.getItem('access_token') || "";
+   const decoded = jwtDecode<DecodedToken>(token);   
+  
   useEffect(() => {
     const fetchClubData = async () => {
       try {
@@ -65,26 +71,31 @@ export function ClubProfile() {
     }
   }, [id]);
 
-  useEffect(() => { 
-    // Fetch the user's followed clubs from the backend to check if the user is following this club
+
+  useEffect(() => {
     const checkFollowingStatus = async () => {
       try {
-        const response = await fetch(`http://localhost:3002/user/user/${user._id}`, {
+        const token = localStorage.getItem('access_token');
+        if (!token || !clubData?._id) return;
+  
+        const decoded = jwtDecode<DecodedToken>(token);       
+        const userId = decoded.sub;
+        const response = await fetch(`http://localhost:3002/user/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+  
         const userData = await response.json();
-        if (userData.followedClubs && userData.followedClubs.includes(clubData?._id)) {
-          setIsFollowing(true); // Set isFollowing if the club is in the followed clubs list
+  
+        if (userData.followedClubs && userData.followedClubs.includes(clubData._id)) {
+          setIsFollowing(true);
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
     };
-
-    if (user && clubData) {
-      checkFollowingStatus();
-    }
-  }, [user?._id, clubData?._id, token]);
+  
+    checkFollowingStatus();
+  }, [clubData?._id]);
 
   const handleClubUpdate = (updatedClub: Partial<Club>) => {
     setClubData((clubData) => {
@@ -113,8 +124,17 @@ export function ClubProfile() {
         throw new Error('Failed to delete club');
       }
 
+          // Step 2: Call the cleanup API to remove references to the club from other users' data
+    const cleanUpResponse = await fetch('http://localhost:3002/clubs/Id/cleanup/clean/id', {
+      method: 'GET',
+    });
+
+    if (!cleanUpResponse.ok) {
+      throw new Error('Failed to clean up club references');
+    }
+
       // Success! Navigate back to a safe place
-      navigate('/explore'); // Assuming you have a clubs listing page
+      navigate('/explore'); 
       
     } catch (error) {
       console.error('Error deleting club:', error);
@@ -134,7 +154,7 @@ export function ClubProfile() {
   };
 
   if (clubData && user) {
-    if (clubData.ownerId === user._id) {
+    if (clubData.ownerId === decoded.sub) {
       isOwner = true;
     }
   } else {
@@ -157,7 +177,7 @@ export function ClubProfile() {
       const response = await fetch(`http://localhost:3002/clubs/${id}/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...postData, authorId: user._id }),
+        body: JSON.stringify({ ...postData, authorId: decoded.sub }),
       });
 
       if (!response.ok) {
@@ -231,7 +251,7 @@ export function ClubProfile() {
               ) : (
                 user && (
                   <FollowButton
-                    userId={user._id}
+                    userId={decoded.sub}
                     clubId={clubData._id}
                     token={localStorage.getItem('access_token') || ''}
                     isFollowing={isFollowing}
