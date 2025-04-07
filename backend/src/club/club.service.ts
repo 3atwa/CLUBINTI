@@ -123,7 +123,7 @@ export class ClubService {
 
   // Delete a club
   async deleteClub(clubId: string): Promise<void> {
-    await this.clubModel.deleteOne({ id: clubId }).exec();
+    await this.clubModel.deleteOne({ _id: clubId }).exec();
   }
 
   // Get club details
