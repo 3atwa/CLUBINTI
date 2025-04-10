@@ -114,7 +114,7 @@ export class AuthService {
       email,
       role,
     };
-    const secret = 'CLUBENTY1StheBE5TPF4ever';
+    const secret = this.config.get<string>('JWT_SECRET');
     const expirationTime = '4h';
 
     const token = await this.jwt.signAsync(payload, {
@@ -129,7 +129,7 @@ export class AuthService {
     try {
       // Use JwtService to verify the token with the secret
       const payload = this.jwt.verify(token, {
-        secret: 'CLUBENTY1StheBE5TPF4ever',
+        secret: this.config.get<string>('JWT_SECRET'),
       });
       console.log(payload);
 
