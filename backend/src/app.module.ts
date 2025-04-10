@@ -13,9 +13,7 @@ import { PostsModule } from './posts/posts.module';
     }),
     MongooseModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
-        uri:'mongodb+srv://CLUBINTI:fIUjuj3sAwRaiLVK@clubinti.mg8mq.mongodb.net/',
-
-        
+        uri: configService.get<string>('MONGO_URI'), // Fetch Mongo URI from .env file
       }),
       inject: [ConfigService], // Inject ConfigService into the useFactory function
     }),
@@ -23,8 +21,6 @@ import { PostsModule } from './posts/posts.module';
     AuthModule,
     ClubModule,
     PostsModule,
-    
-
   ],
   controllers: [],
 })
